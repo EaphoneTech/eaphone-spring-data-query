@@ -1,13 +1,12 @@
-# spring-data-mongodb-datatables
-Datatables binding for [spring-data-mongodb](http://projects.spring.io/spring-data-mongodb/).
+# eaphone-spring-data-query
 
-This is a [sample project](spring-data-mongodb-datatables-samples) showing how it works.
+Customized query binding for [spring-data](http://projects.spring.io/spring-data/).
+
+This is a [sample project](eaphone-spring-data-query-samples) showing how it works.
 
 This project is inspired from [darrachequesne/spring-data-jpa-datatables](https://github.com/darrachequesne/spring-data-jpa-datatables/), which works with spring-data-jpa.
 
 ## Usage ##
-
-Basic usage is the same with [darrachequesne/spring-data-jpa-datatables](https://github.com/darrachequesne/spring-data-jpa-datatables/)
 
 ### Introduce into project ###
 
@@ -15,9 +14,19 @@ Basic usage is the same with [darrachequesne/spring-data-jpa-datatables](https:/
 
 ```xml
 <dependency>
-    <groupId>com.eaphone</groupId>
-    <artifactId>spring-data-mongodb-datatables</artifactId>
-    <version>0.3.2-SNAPSHOT</version>
+    <groupId>com.eaphonetech</groupId>
+    <artifactId>eaphone-spring-data-query-jpa</artifactId>
+    <version>0.4.0-SNAPSHOT</version>
+</dependency>
+```
+
+OR:
+
+```xml
+<dependency>
+    <groupId>com.eaphonetech</groupId>
+    <artifactId>eaphone-spring-data-query-mongodb</artifactId>
+    <version>0.4.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -31,7 +40,7 @@ In any `@Configuration` class, add:
 
 ### Write new Repo ###
 
-Just as spring-data-mongodb does:
+Just as spring-data does:
 
 ```java
 @Repository
@@ -42,6 +51,8 @@ public interface UserRepository extends DataTablesRepository<Order, String> {
 Note that `DataTablesRepository` extends `PagingAndSortingRepository` so it already contains functionalities like `findAll(Pageable)` and `save()`.
 
 ### Expose fields on view ###
+
+Only fields marked with `@JsonView(DataTablesOutput.View.class)` will be displayed in output.
 
 ```java
 @Data
@@ -82,7 +93,7 @@ The repository has the following methods:
   * `DataTablesOutput<T> findAll(DataTablesInput input);`
   * `DataTablesOutput<T> findAll(DataTablesInput input, Criteria additionalCriteria);`
   * `DataTablesOutput<T> findAll(DataTablesInput input, Criteria additionalCriteria, Criteria preFilteringCriteria);`
-* Using Aggregation
+* Using Aggregation (MongoDB only)
   * `<View> DataTablesOutput<View> findAll(Class<View> classOfView, DataTablesInput input, AggregationOperation... operations);`
   * `<View> DataTablesOutput<View> findAll(Class<View> classOfView, DataTablesInput input, Collection<? extends AggregationOperation> operations);`
 
@@ -95,7 +106,7 @@ public DataTablesOutput<Order> getOrders(@Valid DataTablesInput input) {
 }
 ```
 
-Or: 
+#### MongoDB Aggregation ####
 
 ```java
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -117,7 +128,7 @@ public DataTablesOutput<DataView> getAll(@Valid DataTablesInput input) {
 }
 ```
 
-## Filter ##
+## Additional usage: Filter ##
 
 In addition to DataTables' `columns[x].search` parameters, `columns[x].filter` is a new way to define more complex queries.  
 
