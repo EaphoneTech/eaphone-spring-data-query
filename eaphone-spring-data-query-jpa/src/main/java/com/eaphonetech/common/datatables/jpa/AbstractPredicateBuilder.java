@@ -9,6 +9,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
 
 import com.eaphonetech.common.datatables.model.mapping.Column;
+import com.eaphonetech.common.datatables.model.mapping.ColumnType;
 import com.eaphonetech.common.datatables.model.mapping.DataTablesInput;
 import com.eaphonetech.common.datatables.model.mapping.Search;
 
@@ -31,8 +32,25 @@ abstract class AbstractPredicateBuilder<T> {
     private void initTree(DataTablesInput input) {
         for (Column column : input.getColumns()) {
             if (column.isSearchable()) {
+                // datatables impl.
                 addChild(tree, 0, column.getData().split("\\."), column.getSearch());
             }
+            if (column.getFilter() != null) {
+                addChild(tree, 0, column.getData().split("\\."), ColumnType.parse(column.getType()),
+                        column.getFilter());
+            }
+        }
+    }
+
+    private void addChild(Node<Filter> parent, int index, String[] names, ColumnType type,
+            com.eaphonetech.common.datatables.model.mapping.Filter filter) {
+        boolean isLast = index + 1 == names.length;
+        if (isLast) {
+            Node<Filter> child = new Node<Filter>(names[index], new ColumnFilter(type, filter));
+            parent.addChild(child);
+        } else {
+            Node<Filter> child = parent.getOrCreateChild(names[index]);
+            addChild(child, index + 1, names, type, filter);
         }
     }
 
@@ -40,7 +58,8 @@ abstract class AbstractPredicateBuilder<T> {
         boolean isLast = index + 1 == names.length;
         if (isLast) {
             boolean hasColumnFilter = search != null && StringUtils.hasText(search.getValue());
-            parent.addChild(new Node<>(names[index], hasColumnFilter ? new ColumnFilter(search.getValue()) : null));
+            parent.addChild(
+                    new Node<>(names[index], hasColumnFilter ? new ColumnSearchFilter(search.getValue()) : null));
         } else {
             Node<Filter> child = parent.getOrCreateChild(names[index]);
             addChild(child, index + 1, names, search);
