@@ -27,14 +27,19 @@
 
 	<dependencyManagement>
 		<dependencies>
+            <dependency>
+                <groupId>com.eaphonetech</groupId>
+                <artifactId>eaphone-spring-data-query-commons</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.eaphonetech</groupId>
+                <artifactId>eaphone-spring-data-query-jpa</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>com.eaphonetech</groupId>
 				<artifactId>eaphone-spring-data-query-mongodb</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.eaphone</groupId>
-				<artifactId>eaphone-spring-data-query-jpa</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 		</dependencies>
@@ -47,7 +52,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.2</version>
+					<version>3.8.0</version>
 					<configuration>
 						<source>${java.version}</source>
 						<target>${java.version}</target>
@@ -78,6 +83,7 @@
 	</build>
 
 	<modules>
+        <module>eaphone-spring-data-query-commons</module>
 		<module>eaphone-spring-data-query-jpa</module>
 		<module>eaphone-spring-data-query-mongodb</module>
 		<module>eaphone-spring-data-query-jpa-samples</module>
