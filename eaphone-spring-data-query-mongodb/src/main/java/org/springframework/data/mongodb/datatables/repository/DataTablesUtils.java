@@ -1,11 +1,6 @@
 package org.springframework.data.mongodb.datatables.repository;
 
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.limit;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.skip;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.sort;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -342,7 +337,7 @@ public class DataTablesUtils {
             }
         }
 
-        Sort sort = orders.isEmpty() ? null : new Sort(orders);
+        Sort sort = orders.isEmpty() ? null : Sort.by(orders);
 
         if (input.getLength() == -1) {
             input.setStart(0);
@@ -374,7 +369,7 @@ public class DataTablesUtils {
         }
 
         @Override
-        public int getOffset() {
+        public long getOffset() {
             return offset;
         }
 

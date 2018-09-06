@@ -1,6 +1,7 @@
 package org.springframework.data.mongodb.datatables.mapping;
 
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
+
 import org.springframework.util.StringUtils;
 
 import lombok.AllArgsConstructor;

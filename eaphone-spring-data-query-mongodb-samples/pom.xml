@@ -1,18 +1,19 @@
-﻿<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+﻿<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.eaphone</groupId>
-		<artifactId>spring-data-mongodb-datatables-parent</artifactId>
-		<version>0.3.2-SNAPSHOT</version>
+		<groupId>com.eaphonetech</groupId>
+		<artifactId>eaphone-spring-data-query-parent</artifactId>
+		<version>0.4.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>spring-data-mongodb-datatables-samples</artifactId>
+	<artifactId>eaphone-spring-data-query-mongodb-samples</artifactId>
 	<packaging>war</packaging>
 
-	<name>spring-data-mongodb-datatables-samples</name>
-	<description>An example project showing how spring-data-mongodb-datatables works.</description>
+	<name>eaphone-spring-data-query-mongodb-samples</name>
+	<description>An example project showing how eaphone-spring-data-query-mongodb works.</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -22,11 +23,11 @@
 	</properties>
 
 	<dependencies>
-        <dependency>
-            <groupId>com.eaphone</groupId>
-            <artifactId>spring-data-mongodb-datatables</artifactId>
-        </dependency>
-        
+		<dependency>
+			<groupId>com.eaphonetech</groupId>
+			<artifactId>eaphone-spring-data-query-mongodb</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -67,7 +68,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
-			<artifactId>webjars-locator</artifactId>
+			<artifactId>webjars-locator-core</artifactId>
 		</dependency>
 
 	</dependencies>
