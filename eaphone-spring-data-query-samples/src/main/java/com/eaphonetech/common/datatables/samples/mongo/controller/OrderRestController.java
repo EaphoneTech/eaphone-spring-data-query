@@ -1,4 +1,4 @@
-package com.eaphonetech.common.datatables.samples.controller;
+package com.eaphonetech.common.datatables.samples.mongo.controller;
 
 import java.util.Date;
 
@@ -7,8 +7,6 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,9 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.eaphonetech.common.datatables.model.mapping.DataTablesInput;
 import com.eaphonetech.common.datatables.model.mapping.DataTablesOutput;
-import com.eaphonetech.common.datatables.samples.document.Order;
-import com.eaphonetech.common.datatables.samples.repo.OrderRepository;
-import com.eaphonetech.common.datatables.samples.support.SpringDateFormatter;
+import com.eaphonetech.common.datatables.samples.mongo.document.Order;
+import com.eaphonetech.common.datatables.samples.mongo.repo.OrderRepository;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import lombok.extern.slf4j.Slf4j;
@@ -82,10 +79,5 @@ public class OrderRestController {
         repo.save(o);
 
         log.debug("default data successfully initialized.");
-    }
-
-    @InitBinder
-    public void initBinder(WebDataBinder binder) {
-        binder.addCustomFormatter(new SpringDateFormatter());
     }
 }

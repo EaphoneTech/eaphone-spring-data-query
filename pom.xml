@@ -86,7 +86,6 @@
         <module>eaphone-spring-data-query-commons</module>
 		<module>eaphone-spring-data-query-jpa</module>
 		<module>eaphone-spring-data-query-mongodb</module>
-		<module>eaphone-spring-data-query-jpa-samples</module>
-		<module>eaphone-spring-data-query-mongodb-samples</module>
+		<module>eaphone-spring-data-query-samples</module>
 	</modules>
 </project>

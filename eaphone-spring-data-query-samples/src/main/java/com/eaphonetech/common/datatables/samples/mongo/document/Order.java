@@ -1,4 +1,4 @@
-package com.eaphonetech.common.datatables.samples.document;
+package com.eaphonetech.common.datatables.samples.mongo.document;
 
 import java.util.Calendar;
 import java.util.Date;
