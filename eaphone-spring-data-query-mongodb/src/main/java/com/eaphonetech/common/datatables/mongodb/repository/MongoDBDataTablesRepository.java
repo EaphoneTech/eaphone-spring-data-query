@@ -7,14 +7,13 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.repository.NoRepositoryBean;
-import org.springframework.data.repository.PagingAndSortingRepository;
 
 import com.eaphonetech.common.datatables.model.mapping.DataTablesInput;
 import com.eaphonetech.common.datatables.model.mapping.DataTablesOutput;
+import com.eaphonetech.common.datatables.model.mapping.DataTablesRepository;
 
 @NoRepositoryBean
-public interface DataTablesRepository<T, ID extends Serializable>
-        extends PagingAndSortingRepository<T, ID> {
+public interface MongoDBDataTablesRepository<T, ID extends Serializable> extends DataTablesRepository<T, ID> {
 
     /**
      * Returns the filtered list for the given {@link DataTablesInput}.

@@ -16,7 +16,7 @@ import com.eaphonetech.common.datatables.model.mapping.DataTablesInput;
 import com.eaphonetech.common.datatables.model.mapping.DataTablesOutput;
 
 public class DataTablesRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID>
-        implements DataTablesRepository<T, ID> {
+        implements JpaDataTablesRepository<T, ID> {
 
     DataTablesRepositoryImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
 

@@ -31,7 +31,7 @@ import com.eaphonetech.common.datatables.mongodb.model.DataTablesCount;
  * @author Xiaoyu Guo
  */
 public class DataTablesRepositoryImpl<T, ID extends Serializable> extends SimpleMongoRepository<T, ID>
-        implements DataTablesRepository<T, ID> {
+        implements MongoDBDataTablesRepository<T, ID> {
 
     private static final Logger log = LoggerFactory.getLogger(DataTablesRepositoryImpl.class);
 

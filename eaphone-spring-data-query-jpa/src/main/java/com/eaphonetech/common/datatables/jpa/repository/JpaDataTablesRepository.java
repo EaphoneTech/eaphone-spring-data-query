@@ -10,6 +10,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import com.eaphonetech.common.datatables.model.mapping.DataTablesInput;
 import com.eaphonetech.common.datatables.model.mapping.DataTablesOutput;
+import com.eaphonetech.common.datatables.model.mapping.DataTablesRepository;
 
 /**
  * Convenience interface to allow pulling in {@link PagingAndSortingRepository} and
@@ -18,8 +19,8 @@ import com.eaphonetech.common.datatables.model.mapping.DataTablesOutput;
  * @author Damien Arrachequesne
  */
 @NoRepositoryBean
-public interface DataTablesRepository<T, ID extends Serializable>
-        extends PagingAndSortingRepository<T, ID>, JpaSpecificationExecutor<T> {
+public interface JpaDataTablesRepository<T, ID extends Serializable>
+        extends DataTablesRepository<T, ID>, JpaSpecificationExecutor<T> {
 
     /**
      * Returns the filtered list for the given {@link DataTablesInput}.

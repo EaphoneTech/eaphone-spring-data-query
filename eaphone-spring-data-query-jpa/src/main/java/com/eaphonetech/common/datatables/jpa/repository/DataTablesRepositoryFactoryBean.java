@@ -38,7 +38,7 @@ public class DataTablesRepositoryFactoryBean<R extends JpaRepository<T, ID>, T, 
         @Override
         protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
             Class<?> repositoryInterface = metadata.getRepositoryInterface();
-            if (DataTablesRepository.class.isAssignableFrom(repositoryInterface)) {
+            if (JpaDataTablesRepository.class.isAssignableFrom(repositoryInterface)) {
                 return DataTablesRepositoryImpl.class;
             } else {
                 return super.getRepositoryBaseClass(metadata);
