@@ -15,6 +15,9 @@ import com.eaphonetech.common.datatables.jpa.SpecificationBuilder;
 import com.eaphonetech.common.datatables.model.mapping.DataTablesInput;
 import com.eaphonetech.common.datatables.model.mapping.DataTablesOutput;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class DataTablesRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID>
         implements JpaDataTablesRepository<T, ID> {
 
@@ -70,6 +73,7 @@ public class DataTablesRepositoryImpl<T, ID extends Serializable> extends Simple
             output.setRecordsFiltered(data.getTotalElements());
 
         } catch (Exception e) {
+            log.error("exception", e);
             output.setError(e.toString());
         }
 

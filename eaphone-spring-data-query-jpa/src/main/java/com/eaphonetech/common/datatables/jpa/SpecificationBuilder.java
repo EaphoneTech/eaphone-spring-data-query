@@ -31,6 +31,7 @@ public class SpecificationBuilder<T> extends AbstractPredicateBuilder<Specificat
     }
 
     private class DataTablesSpecification<S> implements Specification<S> {
+        private static final long serialVersionUID = 2791974779679792727L;
         private List<Predicate> columnPredicates = new ArrayList<>();
         private List<Predicate> globalPredicates = new ArrayList<>();
 
@@ -62,7 +63,7 @@ public class SpecificationBuilder<T> extends AbstractPredicateBuilder<Specificat
             for (Node<Filter> child : node.getChildren()) {
                 Path<Object> path = from.get(child.getName());
                 if (path instanceof AbstractPathImpl) {
-                    if (((AbstractPathImpl) path).getAttribute().isCollection()) {
+                    if (((AbstractPathImpl<?>) path).getAttribute().isCollection()) {
                         // ignore OneToMany and ManyToMany relationships
                         continue;
                     }
