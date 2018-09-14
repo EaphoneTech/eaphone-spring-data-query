@@ -13,8 +13,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,7 +33,7 @@ public class OrderRestController {
     private OrderRepository repo;
 
     @JsonView(DataTablesOutput.View.class)
-    @RequestMapping(value = "/data/orders", method = RequestMethod.GET)
+    @GetMapping("/data/orders")
     public DataTablesOutput<Order> getOrders(@Valid DataTablesInput input,
             @RequestParam(required = false) Date startDate, @RequestParam(required = false) Date endDate) {
         Specification<Order> spec = between(startDate, endDate);
@@ -50,10 +49,10 @@ public class OrderRestController {
             public Predicate toPredicate(Root<Order> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
                 List<Predicate> predicates = new LinkedList<>();
                 if (startDate != null) {
-                    predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get(""), startDate));
+                    predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("date"), startDate));
                 }
                 if (endDate != null) {
-                    predicates.add(criteriaBuilder.lessThan(root.get(""), endDate));
+                    predicates.add(criteriaBuilder.lessThan(root.get("date"), endDate));
                 }
                 return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
             }
