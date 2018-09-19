@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
 
 @Data
-public class DataTablesOutput<T> {
+public class QueryOutput<T> {
 
   /**
    * The draw counter that this object is a response to - from the draw parameter sent as part of
@@ -23,14 +23,14 @@ public class DataTablesOutput<T> {
    * Total records, before filtering (i.e. the total number of records in the database)
    */
   @JsonView(View.class)
-  private long recordsTotal = 0L;
+  private long total = 0L;
 
   /**
    * Total records, after filtering (i.e. the total number of records after filtering has been
    * applied - not just the number of records being returned for this page of data).
    */
   @JsonView(View.class)
-  private long recordsFiltered = 0L;
+  private long filtered = 0L;
 
   /**
    * The data to be displayed in the table. This is an array of data source objects, one for each

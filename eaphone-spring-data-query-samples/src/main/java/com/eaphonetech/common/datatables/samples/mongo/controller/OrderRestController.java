@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.eaphonetech.common.datatables.model.mapping.DataTablesInput;
-import com.eaphonetech.common.datatables.model.mapping.DataTablesOutput;
+import com.eaphonetech.common.datatables.model.mapping.QueryInput;
+import com.eaphonetech.common.datatables.model.mapping.QueryOutput;
 import com.eaphonetech.common.datatables.samples.mongo.document.Order;
 import com.eaphonetech.common.datatables.samples.mongo.repo.OrderRepository;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * REST Controller returning {@link DataTablesOutput}
+ * REST Controller returning {@link QueryOutput}
  *
  * @author biggates2010
  */
@@ -32,10 +32,10 @@ public class OrderRestController {
     @Autowired
     private OrderRepository repo;
 
-    @JsonView(DataTablesOutput.View.class)
+    @JsonView(QueryOutput.View.class)
     @RequestMapping(value = "/data/orders", method = RequestMethod.GET)
-    public DataTablesOutput<Order> getOrders(@Valid DataTablesInput input,
-            @RequestParam(required = false) Date startDate, @RequestParam(required = false) Date endDate) {
+    public QueryOutput<Order> getOrders(@Valid QueryInput input, @RequestParam(required = false) Date startDate,
+            @RequestParam(required = false) Date endDate) {
         boolean preFiltering = false;
         Criteria crit = Criteria.where("date");
 

@@ -12,45 +12,45 @@ import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 
 import com.eaphonetech.common.datatables.jpa.SpecificationBuilder;
-import com.eaphonetech.common.datatables.model.mapping.DataTablesInput;
-import com.eaphonetech.common.datatables.model.mapping.DataTablesOutput;
+import com.eaphonetech.common.datatables.model.mapping.QueryInput;
+import com.eaphonetech.common.datatables.model.mapping.QueryOutput;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class DataTablesRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID>
-        implements JpaDataTablesRepository<T, ID> {
+public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID>
+        implements JpaQueryRepository<T, ID> {
 
-    DataTablesRepositoryImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
+    EaphoneQueryRepositoryImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
 
         super(entityInformation, entityManager);
     }
 
     @Override
-    public DataTablesOutput<T> findAll(DataTablesInput input) {
+    public QueryOutput<T> findAll(QueryInput input) {
         return findAll(input, null, null, null);
     }
 
     @Override
-    public DataTablesOutput<T> findAll(DataTablesInput input, Specification<T> additionalSpecification) {
+    public QueryOutput<T> findAll(QueryInput input, Specification<T> additionalSpecification) {
         return findAll(input, additionalSpecification, null, null);
     }
 
     @Override
-    public DataTablesOutput<T> findAll(DataTablesInput input, Specification<T> additionalSpecification,
+    public QueryOutput<T> findAll(QueryInput input, Specification<T> additionalSpecification,
             Specification<T> preFilteringSpecification) {
         return findAll(input, additionalSpecification, preFilteringSpecification, null);
     }
 
     @Override
-    public <R> DataTablesOutput<R> findAll(DataTablesInput input, Function<T, R> converter) {
+    public <R> QueryOutput<R> findAll(QueryInput input, Function<T, R> converter) {
         return findAll(input, null, null, converter);
     }
 
     @Override
-    public <R> DataTablesOutput<R> findAll(DataTablesInput input, Specification<T> additionalSpecification,
+    public <R> QueryOutput<R> findAll(QueryInput input, Specification<T> additionalSpecification,
             Specification<T> preFilteringSpecification, Function<T, R> converter) {
-        DataTablesOutput<R> output = new DataTablesOutput<>();
+        QueryOutput<R> output = new QueryOutput<>();
         output.setDraw(input.getDraw());
         if (input.getLength() == 0) {
             return output;
@@ -61,7 +61,7 @@ public class DataTablesRepositoryImpl<T, ID extends Serializable> extends Simple
             if (recordsTotal == 0) {
                 return output;
             }
-            output.setRecordsTotal(recordsTotal);
+            output.setTotal(recordsTotal);
 
             SpecificationBuilder<T> specificationBuilder = new SpecificationBuilder<>(input);
             Page<T> data = findAll(Specification.where(specificationBuilder.build()).and(additionalSpecification)
@@ -70,7 +70,7 @@ public class DataTablesRepositoryImpl<T, ID extends Serializable> extends Simple
             @SuppressWarnings("unchecked")
             List<R> content = converter == null ? (List<R>) data.getContent() : data.map(converter).getContent();
             output.setData(content);
-            output.setRecordsFiltered(data.getTotalElements());
+            output.setFiltered(data.getTotalElements());
 
         } catch (Exception e) {
             log.error("exception", e);

@@ -15,10 +15,10 @@ import org.springframework.data.repository.core.support.RepositoryFactorySupport
  *
  * @author Damien Arrachequesne
  */
-public class DataTablesRepositoryFactoryBean<R extends MongoRepository<T, ID>, T, ID extends Serializable>
+public class EaphoneQueryRepositoryFactoryBean<R extends MongoRepository<T, ID>, T, ID extends Serializable>
         extends MongoRepositoryFactoryBean<R, T, ID> {
 
-    public DataTablesRepositoryFactoryBean(Class<? extends R> repositoryInterface) {
+    public EaphoneQueryRepositoryFactoryBean(Class<? extends R> repositoryInterface) {
         super(repositoryInterface);
     }
 
@@ -36,8 +36,8 @@ public class DataTablesRepositoryFactoryBean<R extends MongoRepository<T, ID>, T
         @Override
         protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
             Class<?> repoClass = metadata.getRepositoryInterface();
-            if (MongoDBDataTablesRepository.class.isAssignableFrom(repoClass)) {
-                return DataTablesRepositoryImpl.class;
+            if (MongoDBQueryRepository.class.isAssignableFrom(repoClass)) {
+                return EaphoneQueryRepositoryImpl.class;
             } else {
                 return super.getRepositoryBaseClass(metadata);
             }

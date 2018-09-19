@@ -8,10 +8,10 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.eaphonetech.common.datatables.model.mapping.DataTablesInput;
+import com.eaphonetech.common.datatables.model.mapping.QueryInput;
 
 /**
- * Registers a {@link HandlerMethodArgumentResolver} that builds up {@link DataTablesInput} from web requests.
+ * Registers a {@link HandlerMethodArgumentResolver} that builds up {@link QueryInput} from web requests.
  * 
  * @author Xiaoyu Guo
  */

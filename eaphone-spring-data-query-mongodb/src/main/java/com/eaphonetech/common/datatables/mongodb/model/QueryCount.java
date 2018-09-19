@@ -2,7 +2,7 @@ package com.eaphonetech.common.datatables.mongodb.model;
 
 import org.springframework.data.mongodb.core.mapping.Field;
 
-public class DataTablesCount {
+public class QueryCount {
     public long getCount() {
         return count;
     }

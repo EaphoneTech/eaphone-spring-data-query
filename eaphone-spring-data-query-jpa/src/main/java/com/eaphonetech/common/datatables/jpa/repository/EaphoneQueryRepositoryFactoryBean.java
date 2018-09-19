@@ -11,17 +11,17 @@ import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 
-import com.eaphonetech.common.datatables.jpa.repository.DataTablesRepositoryImpl;
+import com.eaphonetech.common.datatables.jpa.repository.EaphoneQueryRepositoryImpl;
 
 /**
  * {@link FactoryBean} creating DataTablesRepositoryFactory instances.
  * 
  * @author Damien Arrachequesne
  */
-public class DataTablesRepositoryFactoryBean<R extends JpaRepository<T, ID>, T, ID extends Serializable>
+public class EaphoneQueryRepositoryFactoryBean<R extends JpaRepository<T, ID>, T, ID extends Serializable>
         extends JpaRepositoryFactoryBean<R, T, ID> {
 
-    public DataTablesRepositoryFactoryBean(Class<? extends R> repositoryInterface) {
+    public EaphoneQueryRepositoryFactoryBean(Class<? extends R> repositoryInterface) {
         super(repositoryInterface);
     }
 
@@ -38,8 +38,8 @@ public class DataTablesRepositoryFactoryBean<R extends JpaRepository<T, ID>, T, 
         @Override
         protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
             Class<?> repositoryInterface = metadata.getRepositoryInterface();
-            if (JpaDataTablesRepository.class.isAssignableFrom(repositoryInterface)) {
-                return DataTablesRepositoryImpl.class;
+            if (JpaQueryRepository.class.isAssignableFrom(repositoryInterface)) {
+                return EaphoneQueryRepositoryImpl.class;
             } else {
                 return super.getRepositoryBaseClass(metadata);
             }

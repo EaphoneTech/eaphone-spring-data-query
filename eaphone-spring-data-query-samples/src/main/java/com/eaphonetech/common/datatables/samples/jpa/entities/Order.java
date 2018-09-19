@@ -11,7 +11,7 @@ import javax.persistence.Table;
 
 import org.springframework.data.annotation.Transient;
 
-import com.eaphonetech.common.datatables.model.mapping.DataTablesOutput;
+import com.eaphonetech.common.datatables.model.mapping.QueryOutput;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -24,23 +24,23 @@ public class Order {
 
     @Id
     @GeneratedValue
-    @JsonView(DataTablesOutput.View.class)
+    @JsonView(QueryOutput.View.class)
     private Integer id;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @JsonView(DataTablesOutput.View.class)
+    @JsonView(QueryOutput.View.class)
     private Date date;
 
-    @JsonView(DataTablesOutput.View.class)
+    @JsonView(QueryOutput.View.class)
     private String orderNumber;
 
-    @JsonView(DataTablesOutput.View.class)
+    @JsonView(QueryOutput.View.class)
     private boolean isValid;
 
-    @JsonView(DataTablesOutput.View.class)
+    @JsonView(QueryOutput.View.class)
     private int amount;
 
-    @JsonView(DataTablesOutput.View.class)
+    @JsonView(QueryOutput.View.class)
     private double price;
 
     @Transient

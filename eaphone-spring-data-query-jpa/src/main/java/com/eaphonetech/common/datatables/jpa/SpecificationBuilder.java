@@ -18,10 +18,10 @@ import org.hibernate.query.criteria.internal.path.AbstractPathImpl;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 
-import com.eaphonetech.common.datatables.model.mapping.DataTablesInput;
+import com.eaphonetech.common.datatables.model.mapping.QueryInput;
 
 public class SpecificationBuilder<T> extends AbstractPredicateBuilder<Specification<T>> {
-    public SpecificationBuilder(DataTablesInput input) {
+    public SpecificationBuilder(QueryInput input) {
         super(input);
     }
 

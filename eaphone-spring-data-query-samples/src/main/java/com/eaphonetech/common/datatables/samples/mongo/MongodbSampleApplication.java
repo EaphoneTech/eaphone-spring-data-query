@@ -7,12 +7,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-import com.eaphonetech.common.datatables.mongodb.repository.DataTablesRepositoryFactoryBean;
+import com.eaphonetech.common.datatables.mongodb.repository.EaphoneQueryRepositoryFactoryBean;
 import com.github.fakemongo.Fongo;
 import com.mongodb.MongoClient;
 
 @SpringBootApplication
-@EnableMongoRepositories(repositoryFactoryBeanClass = DataTablesRepositoryFactoryBean.class)
+@EnableMongoRepositories(repositoryFactoryBeanClass = EaphoneQueryRepositoryFactoryBean.class)
 public class MongodbSampleApplication {
 
     @Configuration

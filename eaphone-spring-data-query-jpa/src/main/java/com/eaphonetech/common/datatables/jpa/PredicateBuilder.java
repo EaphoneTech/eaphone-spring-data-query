@@ -3,7 +3,7 @@ package com.eaphonetech.common.datatables.jpa;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.eaphonetech.common.datatables.model.mapping.DataTablesInput;
+import com.eaphonetech.common.datatables.model.mapping.QueryInput;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.PathBuilder;
@@ -13,7 +13,7 @@ public class PredicateBuilder extends AbstractPredicateBuilder<Predicate> {
     private List<Predicate> columnPredicates = new ArrayList<>();
     private List<Predicate> globalPredicates = new ArrayList<>();
 
-    public PredicateBuilder(PathBuilder<?> entity, DataTablesInput input) {
+    public PredicateBuilder(PathBuilder<?> entity, QueryInput input) {
         super(input);
         this.entity = entity;
     }

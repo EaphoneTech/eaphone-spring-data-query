@@ -1,6 +1,7 @@
 package com.eaphonetech.common.datatables.jpa.columns;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,6 +14,7 @@ import org.springframework.util.StringUtils;
 
 import com.eaphonetech.common.datatables.model.mapping.ColumnType;
 import com.eaphonetech.common.datatables.model.mapping.Filter;
+import com.eaphonetech.common.datatables.util.DateUtils;
 import com.google.common.collect.Lists;
 import com.querydsl.core.types.Ops;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -70,7 +72,7 @@ public abstract class AbstractColumnTypeDecorator {
                 ops.add(Expressions.stringOperation(Ops.STRING_CAST, path).eq(filter.getEq()));
             }
             if (StringUtils.hasLength(filter.getNe())) {
-                ops.add(Expressions.stringOperation(Ops.STRING_CAST, path).eq(filter.getNe()).not());
+                ops.add(Expressions.stringOperation(Ops.STRING_CAST, path).ne(filter.getNe()));
             }
             if (StringUtils.hasLength(filter.getIn())) {
                 String[] parts = filter.getIn().split(",");
@@ -83,6 +85,9 @@ public abstract class AbstractColumnTypeDecorator {
             if (StringUtils.hasLength(filter.getRegex())) {
                 ops.add(Expressions.stringOperation(Ops.LIKE, path).like(filter.getRegex()));
             }
+            if (StringUtils.hasLength(filter.getLike())) {
+                ops.add(Expressions.stringOperation(Ops.LIKE, path).like(filter.getLike()));
+            }
             if (filter.getIsEmpty() != null) {
                 if (filter.getIsEmpty()) {
                     ops.add(Expressions.stringOperation(Ops.STRING_IS_EMPTY, path).isEmpty());
@@ -94,7 +99,7 @@ public abstract class AbstractColumnTypeDecorator {
                 if (filter.getIsNull()) {
                     ops.add(Expressions.stringOperation(Ops.IS_NULL, path).isNull());
                 } else {
-                    ops.add(Expressions.stringOperation(Ops.IS_NULL, path).isNull().not());
+                    ops.add(Expressions.stringOperation(Ops.IS_NULL, path).isNotNull());
                 }
             }
         }
@@ -118,13 +123,25 @@ public abstract class AbstractColumnTypeDecorator {
                 predicates.add(crit.not(exp.in(parts)));
             }
             if (StringUtils.hasLength(filter.getRegex())) {
-                predicates.add(crit.like(exp, filter.getRegex()));
+                // TODO Need test here about regular expressions
+                // src: https://stackoverflow.com/questions/24995881/use-regular-expressions-in-jpa-criteriabuilder
+                predicates.add(//
+                        crit.equal(//
+                                crit.function("regexp", Integer.class, exp, crit.literal(filter.getRegex()))//
+                , 1));
+            }
+            if (StringUtils.hasLength(filter.getLike())) {
+                // TODO Need test here about whether '%' should be added
+                predicates.add(crit.like(exp, filter.getLike()));
             }
             if (filter.getIsEmpty() != null) {
-                // TODO 完成这个逻辑
-                log.warn("isEmpty() 尚未实现");
+                // TODO Need test here about type cast
+                // TODO here isEmpty() is different from previous {@link Ops.STRING_IS_EMPTY}
+                Expression<Collection> expc = expression.as(Collection.class);
                 if (filter.getIsEmpty()) {
+                    predicates.add(crit.isEmpty(expc));
                 } else {
+                    predicates.add(crit.isNotEmpty(expc));
                 }
             }
             if (filter.getIsNull() != null) {
@@ -142,6 +159,14 @@ public abstract class AbstractColumnTypeDecorator {
             return Integer.parseInt(text);
         }
 
+        private List<Integer> parseList(String text) {
+            return Arrays.stream(text.split(",")) //
+                    .map(String::trim) //
+                    .filter(StringUtils::hasLength) //
+                    .map(Integer::parseInt) //
+                    .collect(Collectors.toList());
+        }
+
         @Override
         public void fillOperations(List<BooleanExpression> ops, PathBuilder<Object> path, Filter filter) {
             if (StringUtils.hasLength(filter.getEq())) {
@@ -151,14 +176,10 @@ public abstract class AbstractColumnTypeDecorator {
                 ops.add(Expressions.numberOperation(Integer.class, Ops.NOT, path).eq(parse(filter.getNe())));
             }
             if (StringUtils.hasLength(filter.getIn())) {
-                List<Integer> parts = Arrays.stream(filter.getIn().split(",")).map(String::trim).map(Integer::parseInt)
-                        .collect(Collectors.toList());
-                ops.add(Expressions.numberOperation(Integer.class, Ops.IN, path).in(parts));
+                ops.add(Expressions.numberOperation(Integer.class, Ops.IN, path).in(parseList(filter.getIn())));
             }
             if (StringUtils.hasLength(filter.getNin())) {
-                List<Integer> parts = Arrays.stream(filter.getIn().split(",")).map(String::trim).map(Integer::parseInt)
-                        .collect(Collectors.toList());
-                ops.add(Expressions.numberOperation(Integer.class, Ops.NOT_IN, path).notIn(parts));
+                ops.add(Expressions.numberOperation(Integer.class, Ops.NOT_IN, path).notIn(parseList(filter.getNin())));
             }
             if (StringUtils.hasLength(filter.getLt())) {
                 ops.add(Expressions.numberOperation(Integer.class, Ops.LT, path).lt(parse(filter.getLt())));
@@ -176,7 +197,7 @@ public abstract class AbstractColumnTypeDecorator {
                 if (filter.getIsNull()) {
                     ops.add(Expressions.numberOperation(Integer.class, Ops.IS_NULL, path).isNull());
                 } else {
-                    ops.add(Expressions.numberOperation(Integer.class, Ops.IS_NULL, path).isNull().not());
+                    ops.add(Expressions.numberOperation(Integer.class, Ops.IS_NULL, path).isNotNull());
                 }
             }
         }
@@ -192,14 +213,10 @@ public abstract class AbstractColumnTypeDecorator {
                 predicates.add(crit.notEqual(exp, parse(filter.getNe())));
             }
             if (StringUtils.hasLength(filter.getIn())) {
-                List<Integer> parts = Arrays.stream(filter.getIn().split(",")).map(String::trim).map(Integer::parseInt)
-                        .collect(Collectors.toList());
-                predicates.add(exp.in(parts));
+                predicates.add(exp.in(parseList(filter.getIn())));
             }
             if (StringUtils.hasLength(filter.getNin())) {
-                List<Integer> parts = Arrays.stream(filter.getIn().split(",")).map(String::trim).map(Integer::parseInt)
-                        .collect(Collectors.toList());
-                predicates.add(crit.not(exp.in(parts)));
+                predicates.add(crit.not(exp.in(parseList(filter.getNin()))));
             }
             if (StringUtils.hasLength(filter.getLt())) {
                 predicates.add(crit.lessThan(exp, parse(filter.getLt())));
@@ -227,6 +244,14 @@ public abstract class AbstractColumnTypeDecorator {
             return Double.parseDouble(text);
         }
 
+        private List<Double> parseList(String text) {
+            return Arrays.stream(text.split(",")) //
+                    .map(String::trim) //
+                    .filter(StringUtils::hasLength) //
+                    .map(Double::parseDouble) //
+                    .collect(Collectors.toList());
+        }
+
         @Override
         public void fillOperations(List<BooleanExpression> ops, PathBuilder<Object> path, Filter filter) {
             if (StringUtils.hasLength(filter.getEq())) {
@@ -236,14 +261,10 @@ public abstract class AbstractColumnTypeDecorator {
                 ops.add(Expressions.numberOperation(Double.class, Ops.NOT, path).eq(parse(filter.getNe())));
             }
             if (StringUtils.hasLength(filter.getIn())) {
-                List<Double> parts = Arrays.stream(filter.getIn().split(",")).map(String::trim).map(Double::parseDouble)
-                        .collect(Collectors.toList());
-                ops.add(Expressions.numberOperation(Double.class, Ops.IN, path).in(parts));
+                ops.add(Expressions.numberOperation(Double.class, Ops.IN, path).in(parseList(filter.getIn())));
             }
             if (StringUtils.hasLength(filter.getNin())) {
-                List<Double> parts = Arrays.stream(filter.getIn().split(",")).map(String::trim).map(Double::parseDouble)
-                        .collect(Collectors.toList());
-                ops.add(Expressions.numberOperation(Double.class, Ops.NOT_IN, path).notIn(parts));
+                ops.add(Expressions.numberOperation(Double.class, Ops.NOT_IN, path).notIn(parseList(filter.getNin())));
             }
             if (StringUtils.hasLength(filter.getLt())) {
                 ops.add(Expressions.numberOperation(Double.class, Ops.LT, path).lt(parse(filter.getLt())));
@@ -261,7 +282,7 @@ public abstract class AbstractColumnTypeDecorator {
                 if (filter.getIsNull()) {
                     ops.add(Expressions.numberOperation(Double.class, Ops.IS_NULL, path).isNull());
                 } else {
-                    ops.add(Expressions.numberOperation(Double.class, Ops.IS_NULL, path).isNull().not());
+                    ops.add(Expressions.numberOperation(Double.class, Ops.IS_NULL, path).isNotNull());
                 }
             }
         }
@@ -277,14 +298,10 @@ public abstract class AbstractColumnTypeDecorator {
                 predicates.add(crit.notEqual(exp, parse(filter.getNe())));
             }
             if (StringUtils.hasLength(filter.getIn())) {
-                List<Integer> parts = Arrays.stream(filter.getIn().split(",")).map(String::trim).map(Integer::parseInt)
-                        .collect(Collectors.toList());
-                predicates.add(exp.in(parts));
+                predicates.add(exp.in(parseList(filter.getIn())));
             }
             if (StringUtils.hasLength(filter.getNin())) {
-                List<Integer> parts = Arrays.stream(filter.getIn().split(",")).map(String::trim).map(Integer::parseInt)
-                        .collect(Collectors.toList());
-                predicates.add(crit.not(exp.in(parts)));
+                predicates.add(crit.not(exp.in(parseList(filter.getNin()))));
             }
             if (StringUtils.hasLength(filter.getLt())) {
                 predicates.add(crit.lessThan(exp, parse(filter.getLt())));
@@ -325,7 +342,7 @@ public abstract class AbstractColumnTypeDecorator {
                 if (filter.getIsNull()) {
                     ops.add(Expressions.booleanOperation(Ops.IS_NULL, path).isNull());
                 } else {
-                    ops.add(Expressions.booleanOperation(Ops.IS_NULL, path).isNull().not());
+                    ops.add(Expressions.booleanOperation(Ops.IS_NULL, path).isNotNull());
                 }
             }
         }
@@ -351,9 +368,15 @@ public abstract class AbstractColumnTypeDecorator {
     };
     private static final AbstractColumnTypeDecorator DATE = new AbstractColumnTypeDecorator() {
         private Date parse(String text) {
-            // TODO
-            log.warn("尚未实现");
-            return null;
+            return DateUtils.tryParse(DateUtils.FORMAT_YMD, text);
+        }
+
+        private List<Date> parseList(String text) {
+            return Arrays.stream(text.split(",")) //
+                    .map(String::trim) //
+                    .filter(StringUtils::hasLength) //
+                    .map(p -> DateUtils.tryParse(DateUtils.FORMAT_YMD, p)) //
+                    .collect(Collectors.toList());
         }
 
         @Override
@@ -365,14 +388,10 @@ public abstract class AbstractColumnTypeDecorator {
                 ops.add(Expressions.dateOperation(Date.class, Ops.NOT, path).eq(parse(filter.getNe())));
             }
             if (StringUtils.hasLength(filter.getIn())) {
-                List<Date> parts = Arrays.stream(filter.getIn().split(",")).map(String::trim).map(r -> new Date())
-                        .collect(Collectors.toList());
-                ops.add(Expressions.dateOperation(Date.class, Ops.IN, path).in(parts));
+                ops.add(Expressions.dateOperation(Date.class, Ops.IN, path).in(parseList(filter.getIn())));
             }
             if (StringUtils.hasLength(filter.getNin())) {
-                List<Date> parts = Arrays.stream(filter.getIn().split(",")).map(String::trim).map(r -> new Date())
-                        .collect(Collectors.toList());
-                ops.add(Expressions.dateOperation(Date.class, Ops.NOT_IN, path).notIn(parts));
+                ops.add(Expressions.dateOperation(Date.class, Ops.NOT_IN, path).notIn(parseList(filter.getNin())));
             }
             if (StringUtils.hasLength(filter.getLt())) {
                 ops.add(Expressions.dateOperation(Date.class, Ops.LT, path).lt(parse(filter.getLt())));
@@ -387,10 +406,10 @@ public abstract class AbstractColumnTypeDecorator {
                 ops.add(Expressions.dateOperation(Date.class, Ops.GOE, path).loe(parse(filter.getGte())));
             }
             if (filter.getIsNull() != null) {
-                if (filter.getIsNull()) {
+                if (filter.getIsNull().booleanValue()) {
                     ops.add(Expressions.dateOperation(Date.class, Ops.IS_NULL, path).isNull());
                 } else {
-                    ops.add(Expressions.dateOperation(Date.class, Ops.IS_NULL, path).isNull().not());
+                    ops.add(Expressions.dateOperation(Date.class, Ops.IS_NULL, path).isNotNull());
                 }
             }
         }
@@ -406,14 +425,10 @@ public abstract class AbstractColumnTypeDecorator {
                 predicates.add(crit.notEqual(exp, parse(filter.getNe())));
             }
             if (StringUtils.hasLength(filter.getIn())) {
-                List<Integer> parts = Arrays.stream(filter.getIn().split(",")).map(String::trim).map(Integer::parseInt)
-                        .collect(Collectors.toList());
-                predicates.add(exp.in(parts));
+                predicates.add(exp.in(parseList(filter.getIn())));
             }
             if (StringUtils.hasLength(filter.getNin())) {
-                List<Integer> parts = Arrays.stream(filter.getIn().split(",")).map(String::trim).map(Integer::parseInt)
-                        .collect(Collectors.toList());
-                predicates.add(crit.not(exp.in(parts)));
+                predicates.add(crit.not(exp.in(parseList(filter.getNin()))));
             }
             if (StringUtils.hasLength(filter.getLt())) {
                 predicates.add(crit.lessThan(exp, parse(filter.getLt())));

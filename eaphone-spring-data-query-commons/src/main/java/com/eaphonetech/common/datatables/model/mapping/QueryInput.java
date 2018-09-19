@@ -10,7 +10,7 @@ import javax.validation.constraints.Min;
 import lombok.Data;
 
 @Data
-public class DataTablesInput {
+public class QueryInput {
 
     /**
      * Draw counter. This is used by DataTables to ensure that the Ajax returns from server-side
@@ -45,21 +45,21 @@ public class DataTablesInput {
     /**
      * Order parameter
      */
-    private List<Order> order = new ArrayList<Order>();
+    private List<QueryOrder> orders = new ArrayList<QueryOrder>();
 
     /**
      * Per-column search parameter
      */
-    private List<Column> columns = new ArrayList<Column>();
+    private List<QueryField> fields = new ArrayList<QueryField>();
 
     /**
      * 
-     * @return a {@link Map} of {@link Column} indexed by name
+     * @return a {@link Map} of {@link QueryField} indexed by name
      */
-    public Map<String, Column> getColumnsAsMap() {
-        Map<String, Column> map = new HashMap<String, Column>();
-        for (Column column : columns) {
-            map.put(column.getData(), column);
+    public Map<String, QueryField> getFieldsAsMap() {
+        Map<String, QueryField> map = new HashMap<String, QueryField>();
+        for (QueryField field : fields) {
+            map.put(field.getField(), field);
         }
         return map;
     }
@@ -70,13 +70,13 @@ public class DataTablesInput {
      * @param columnName the name of the column
      * @return the given Column, or <code>null</code> if not found
      */
-    public Column getColumn(String columnName) {
+    public QueryField getField(String columnName) {
         if (columnName == null) {
             return null;
         }
-        for (Column column : columns) {
-            if (columnName.equals(column.getData())) {
-                return column;
+        for (QueryField field : fields) {
+            if (columnName.equals(field.getField())) {
+                return field;
             }
         }
         return null;

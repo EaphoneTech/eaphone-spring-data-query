@@ -6,6 +6,6 @@ import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 @NoRepositoryBean
-public interface DataTablesRepository<T, ID extends Serializable> extends PagingAndSortingRepository<T, ID> {
+public interface EaphoneQueryRepository<T, ID extends Serializable> extends PagingAndSortingRepository<T, ID> {
 
 }

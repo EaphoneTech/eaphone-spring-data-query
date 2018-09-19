@@ -13,6 +13,7 @@ public class Filter {
     private String in;
     private String nin;
     private String regex;
+    private String like;
     private Boolean exists;
     private Boolean isNull;
     private Boolean isEmpty;

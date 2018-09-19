@@ -7,10 +7,10 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import com.eaphonetech.common.datatables.model.mapping.DataTablesInput;
+import com.eaphonetech.common.datatables.model.mapping.QueryInput;
 
 /**
- * {@link HandlerMethodArgumentResolver} to allow injection of {@link DataTablesInput} into
+ * {@link HandlerMethodArgumentResolver} to allow injection of {@link QueryInput} into
  * Spring MVC controller methods
  * 
  * @author Xiaoyu Guo
@@ -19,7 +19,7 @@ public class DataTablesArgumentResolver implements HandlerMethodArgumentResolver
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        if (DataTablesInput.class.equals(parameter.getParameterType())) {
+        if (QueryInput.class.equals(parameter.getParameterType())) {
             return true;
         }
         return false;
