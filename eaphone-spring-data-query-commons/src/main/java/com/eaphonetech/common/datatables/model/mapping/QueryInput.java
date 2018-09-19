@@ -50,18 +50,14 @@ public class QueryInput {
     /**
      * Per-column search parameter
      */
-    private List<QueryField> fields = new ArrayList<QueryField>();
+    private Map<String, QueryField> fields = new HashMap<>();
 
     /**
      * 
      * @return a {@link Map} of {@link QueryField} indexed by name
      */
     public Map<String, QueryField> getFieldsAsMap() {
-        Map<String, QueryField> map = new HashMap<String, QueryField>();
-        for (QueryField field : fields) {
-            map.put(field.getField(), field);
-        }
-        return map;
+        return fields;
     }
 
     /**
@@ -74,11 +70,18 @@ public class QueryInput {
         if (columnName == null) {
             return null;
         }
-        for (QueryField field : fields) {
-            if (columnName.equals(field.getField())) {
-                return field;
-            }
+        if (this.fields.containsKey(columnName)) {
+            QueryField qf = this.fields.get(columnName);
+            qf.setField(columnName);
+            return qf;
         }
         return null;
+    }
+
+    public void addField(QueryField qf) {
+        if (this.fields == null) {
+            this.fields = new HashMap<>();
+        }
+        this.fields.put(qf.getField(), qf);
     }
 }

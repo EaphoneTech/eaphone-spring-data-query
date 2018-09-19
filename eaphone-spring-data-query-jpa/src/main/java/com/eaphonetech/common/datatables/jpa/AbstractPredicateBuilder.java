@@ -2,6 +2,7 @@ package com.eaphonetech.common.datatables.jpa;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,8 +30,10 @@ abstract class AbstractPredicateBuilder<T> {
     }
 
     private void initTree(QueryInput input) {
-        for (QueryField column : input.getFields()) {
-            addChild(tree, 0, column.getField().split("\\."), ColumnType.parse(column.getType()), column);
+        for (Map.Entry<String, QueryField> entry : input.getFields().entrySet()) {
+            final String fieldName = entry.getKey();
+            final QueryField field = entry.getValue();
+            addChild(tree, 0, fieldName.split("\\."), ColumnType.parse(field.getType()), field);
         }
     }
 

@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -177,15 +178,15 @@ public class QueryUtils {
             MongoEntityInformation<T, ID> entityInformation) {
         List<Criteria> result = new LinkedList<>();
         // check for each searchable column whether a filter value exists
-        List<QueryField> columns = input.getFields();
-
-        for (final QueryField column : columns) {
-            final ColumnType type = ColumnType.parse(column.getType());
-            final Filter filter = column;
+        for (final Map.Entry<String, QueryField> entry : input.getFields().entrySet()) {
+            final QueryField field = entry.getValue();
+            final String fieldName = entry.getKey();
+            final ColumnType type = ColumnType.parse(field.getType());
+            final Filter filter = field;
             // handle column.filter
             if (filter != null) {
                 boolean hasValidCrit = false;
-                Criteria c = Criteria.where(getFieldName(entityInformation.getJavaType(), column.getField()));
+                Criteria c = Criteria.where(getFieldName(entityInformation.getJavaType(), fieldName));
                 if (StringUtils.hasLength(filter.getEq())) {
                     // $eq takes first place
                     c.is(type.tryConvert(filter.getEq()));
@@ -288,12 +289,12 @@ public class QueryUtils {
     public static Pageable getPageable(QueryInput input) {
         List<Order> orders = new ArrayList<Order>();
         for (QueryOrder order : input.getOrders()) {
-            QueryField column = null;
+            QueryField field = null;
             if (StringUtils.hasLength(order.getField())) {
-                column = input.getField(order.getField());
+                field = input.getField(order.getField());
             }
 
-            if (column == null) {
+            if (field == null) {
                 if (StringUtils.hasLength(order.getField())) {
                     // in case if input has no columns defined
                     Direction sortDirection = Direction.fromString(order.getDir());
@@ -302,7 +303,7 @@ public class QueryUtils {
                     log.debug("Warning: unable to find column by specified order {}", order);
                 }
             } else {
-                String sortColumn = column.getField();
+                String sortColumn = field.getField();
                 Direction sortDirection = Direction.fromString(order.getDir());
                 orders.add(new Order(sortDirection, sortColumn));
             }
