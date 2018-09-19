@@ -27,10 +27,9 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
 import org.springframework.util.StringUtils;
 
 import com.eaphonetech.common.datatables.model.mapping.ColumnType;
-import com.eaphonetech.common.datatables.model.mapping.Filter;
-import com.eaphonetech.common.datatables.model.mapping.QueryField;
 import com.eaphonetech.common.datatables.model.mapping.QueryInput;
 import com.eaphonetech.common.datatables.model.mapping.QueryOrder;
+import com.eaphonetech.common.datatables.model.mapping.filter.QueryField;
 import com.eaphonetech.common.datatables.mongodb.model.QueryCount;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Predicate;
@@ -38,7 +37,7 @@ import com.google.common.base.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class QueryUtils {
+class QueryUtils {
 
     private static final String COMMA = ",";
 
@@ -54,7 +53,7 @@ public class QueryUtils {
         }
     }
 
-    public static <T, ID extends Serializable> Query getQuery(MongoEntityInformation<T, ID> entityInformation,
+    static <T, ID extends Serializable> Query getQuery(MongoEntityInformation<T, ID> entityInformation,
             final QueryInput input) {
         Query q = new Query();
         List<Criteria> criteriaList = getCriteria(input, entityInformation);
@@ -178,11 +177,10 @@ public class QueryUtils {
             MongoEntityInformation<T, ID> entityInformation) {
         List<Criteria> result = new LinkedList<>();
         // check for each searchable column whether a filter value exists
-        for (final Map.Entry<String, QueryField> entry : input.getFields().entrySet()) {
-            final QueryField field = entry.getValue();
+        for (final Map.Entry<String, QueryField> entry : input.getFilters().entrySet()) {
+            final QueryField filter = entry.getValue();
             final String fieldName = entry.getKey();
-            final ColumnType type = ColumnType.parse(field.getType());
-            final Filter filter = field;
+            final ColumnType type = ColumnType.parse(filter.getType());
             // handle column.filter
             if (filter != null) {
                 boolean hasValidCrit = false;
@@ -286,7 +284,7 @@ public class QueryUtils {
      * @param input the {@link QueryInput} mapped from the Ajax request
      * @return a {@link Pageable}, must not be {@literal null}.
      */
-    public static Pageable getPageable(QueryInput input) {
+    static Pageable getPageable(QueryInput input) {
         List<Order> orders = new ArrayList<Order>();
         for (QueryOrder order : input.getOrders()) {
             QueryField field = null;
@@ -418,7 +416,7 @@ public class QueryUtils {
      * @param operations
      * @return
      */
-    public static <T, ID extends Serializable> TypedAggregation<QueryCount> makeAggregationCountOnly(
+    static <T, ID extends Serializable> TypedAggregation<QueryCount> makeAggregationCountOnly(
             MongoEntityInformation<T, ID> entityInformation, QueryInput input, AggregationOperation[] operations) {
         List<AggregationOperation> opList = new LinkedList<>();
         if (operations != null) {
@@ -443,7 +441,7 @@ public class QueryUtils {
      * @param operations
      * @return
      */
-    public static <T> TypedAggregation<T> makeAggregation(Class<T> classOfT, QueryInput input, Pageable pageable,
+    static <T> TypedAggregation<T> makeAggregation(Class<T> classOfT, QueryInput input, Pageable pageable,
             AggregationOperation[] operations) {
         List<AggregationOperation> opList = new LinkedList<>();
         if (operations != null) {

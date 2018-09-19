@@ -13,7 +13,7 @@ import javax.persistence.criteria.Predicate;
 import org.springframework.util.StringUtils;
 
 import com.eaphonetech.common.datatables.model.mapping.ColumnType;
-import com.eaphonetech.common.datatables.model.mapping.Filter;
+import com.eaphonetech.common.datatables.model.mapping.filter.QueryFilter;
 import com.eaphonetech.common.datatables.util.DateUtils;
 import com.google.common.collect.Lists;
 import com.querydsl.core.types.Ops;
@@ -21,15 +21,12 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.PathBuilder;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public abstract class AbstractColumnTypeDecorator {
 
-    public abstract void fillOperations(List<BooleanExpression> ops, PathBuilder<Object> path, Filter filter);
+    public abstract void fillOperations(List<BooleanExpression> ops, PathBuilder<Object> path, QueryFilter filter);
 
     public abstract void fillPredicates(List<Predicate> predicates, CriteriaBuilder crit, Expression<?> expression,
-            Filter filter);
+            QueryFilter filter);
 
     /**
      * 类似于工厂模式
@@ -56,18 +53,18 @@ public abstract class AbstractColumnTypeDecorator {
 
     private static final AbstractColumnTypeDecorator EMPTY = new AbstractColumnTypeDecorator() {
         @Override
-        public void fillOperations(List<BooleanExpression> ops, PathBuilder<Object> path, Filter filter) {
+        public void fillOperations(List<BooleanExpression> ops, PathBuilder<Object> path, QueryFilter filter) {
         }
 
         @Override
         public void fillPredicates(List<Predicate> predicates, CriteriaBuilder crit, Expression<?> expression,
-                Filter filter) {
+                QueryFilter filter) {
         }
     };
 
     private static final AbstractColumnTypeDecorator STRING = new AbstractColumnTypeDecorator() {
         @Override
-        public void fillOperations(List<BooleanExpression> ops, PathBuilder<Object> path, Filter filter) {
+        public void fillOperations(List<BooleanExpression> ops, PathBuilder<Object> path, QueryFilter filter) {
             if (StringUtils.hasLength(filter.getEq())) {
                 ops.add(Expressions.stringOperation(Ops.STRING_CAST, path).eq(filter.getEq()));
             }
@@ -106,7 +103,7 @@ public abstract class AbstractColumnTypeDecorator {
 
         @Override
         public void fillPredicates(List<Predicate> predicates, CriteriaBuilder crit, Expression<?> expression,
-                Filter filter) {
+                QueryFilter filter) {
             Expression<String> exp = expression.as(String.class);
             if (StringUtils.hasLength(filter.getEq())) {
                 predicates.add(crit.equal(exp, filter.getEq()));
@@ -168,7 +165,7 @@ public abstract class AbstractColumnTypeDecorator {
         }
 
         @Override
-        public void fillOperations(List<BooleanExpression> ops, PathBuilder<Object> path, Filter filter) {
+        public void fillOperations(List<BooleanExpression> ops, PathBuilder<Object> path, QueryFilter filter) {
             if (StringUtils.hasLength(filter.getEq())) {
                 ops.add(Expressions.numberOperation(Integer.class, Ops.EQ, path).eq(parse(filter.getEq())));
             }
@@ -204,7 +201,7 @@ public abstract class AbstractColumnTypeDecorator {
 
         @Override
         public void fillPredicates(List<Predicate> predicates, CriteriaBuilder crit, Expression<?> expression,
-                Filter filter) {
+                QueryFilter filter) {
             Expression<Integer> exp = expression.as(Integer.class);
             if (StringUtils.hasLength(filter.getEq())) {
                 predicates.add(crit.equal(exp, parse(filter.getEq())));
@@ -253,7 +250,7 @@ public abstract class AbstractColumnTypeDecorator {
         }
 
         @Override
-        public void fillOperations(List<BooleanExpression> ops, PathBuilder<Object> path, Filter filter) {
+        public void fillOperations(List<BooleanExpression> ops, PathBuilder<Object> path, QueryFilter filter) {
             if (StringUtils.hasLength(filter.getEq())) {
                 ops.add(Expressions.numberOperation(Double.class, Ops.EQ, path).eq(parse(filter.getEq())));
             }
@@ -289,7 +286,7 @@ public abstract class AbstractColumnTypeDecorator {
 
         @Override
         public void fillPredicates(List<Predicate> predicates, CriteriaBuilder crit, Expression<?> expression,
-                Filter filter) {
+                QueryFilter filter) {
             Expression<Double> exp = expression.as(Double.class);
             if (StringUtils.hasLength(filter.getEq())) {
                 predicates.add(crit.equal(exp, parse(filter.getEq())));
@@ -331,7 +328,7 @@ public abstract class AbstractColumnTypeDecorator {
         }
 
         @Override
-        public void fillOperations(List<BooleanExpression> ops, PathBuilder<Object> path, Filter filter) {
+        public void fillOperations(List<BooleanExpression> ops, PathBuilder<Object> path, QueryFilter filter) {
             if (StringUtils.hasLength(filter.getEq())) {
                 ops.add(Expressions.booleanOperation(Ops.EQ, path).eq(parse(filter.getEq())));
             }
@@ -349,7 +346,7 @@ public abstract class AbstractColumnTypeDecorator {
 
         @Override
         public void fillPredicates(List<Predicate> predicates, CriteriaBuilder crit, Expression<?> expression,
-                Filter filter) {
+                QueryFilter filter) {
             Expression<Boolean> exp = expression.as(Boolean.class);
             if (StringUtils.hasLength(filter.getEq())) {
                 predicates.add(crit.equal(exp, parse(filter.getEq())));
@@ -380,7 +377,7 @@ public abstract class AbstractColumnTypeDecorator {
         }
 
         @Override
-        public void fillOperations(List<BooleanExpression> ops, PathBuilder<Object> path, Filter filter) {
+        public void fillOperations(List<BooleanExpression> ops, PathBuilder<Object> path, QueryFilter filter) {
             if (StringUtils.hasLength(filter.getEq())) {
                 ops.add(Expressions.dateOperation(Date.class, Ops.EQ, path).eq(parse(filter.getEq())));
             }
@@ -416,7 +413,7 @@ public abstract class AbstractColumnTypeDecorator {
 
         @Override
         public void fillPredicates(List<Predicate> predicates, CriteriaBuilder crit, Expression<?> expression,
-                Filter filter) {
+                QueryFilter filter) {
             Expression<Date> exp = expression.as(Date.class);
             if (StringUtils.hasLength(filter.getEq())) {
                 predicates.add(crit.equal(exp, parse(filter.getEq())));

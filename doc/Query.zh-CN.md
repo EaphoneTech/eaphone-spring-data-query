@@ -12,6 +12,38 @@
 1. 在 GET 接口上通过 query 方式即 `?firstname=Dave&lastname=Matthews` 进行简单的查询。
 2. 在 POST 接口上通过 `@RequestBody` 方式传入较为完整的查询内容
 
+```json
+{
+    "draw": 1,
+    "start": 0,
+    "length": 10,
+    "orders": [{
+        "field": "field1",
+        "dir": "asc"
+    }, {
+        "field": "field2",
+        "dir": "desc"
+    }],
+    "filters": {
+        "field1": {
+            "gt": "",
+            "gte": "",
+            "lt": "",
+            "lte": "",
+            "eq": "",
+            "ne": "",
+            "in": [],
+            "nin": [],
+            "regex": "",
+            "like": "",
+            "exists": true,
+            "isNull": true,
+            "isEmpty": true
+        }
+    }
+}
+```
+
 ## 实例 ##
 
 为了增强可读性，下面的请求认为在 `@GetMapping("/")` 上进行，并且参数都没有进行转码。
@@ -51,19 +83,25 @@ POST /search
 
 ### 按某一列排序 ###
 
-在最简单的情况下排序：
+最简单的排序：
 
 ```http
 GET /?$order=price.value,desc
 ```
 
+稍微复杂一些的排序（请注意排序的顺序是有意义的，因此使用数组形式）：
+
 ```http
 POST /search
 
 {
-    "orders": {
-        "price.value": "desc"
-    }
+    "orders": [{
+        "field": "price.value",
+        "dir": "asc"
+    }, {
+        "field": "createTime",
+        "dir": "desc"
+    }],
 }
 ```
 
@@ -77,10 +115,11 @@ GET /?user.name=张三丰
 POST /search
 
 {
-    "fields": [{
-        "field": "user.name",
-        "eq": "张三丰"
-    }]
+    "filters": {
+        "user.name": {
+            "eq": "张三丰"
+        }
+    }
 }
 ```
 
@@ -96,10 +135,11 @@ GET /?user.name.$like=张三丰
 POST /search
 
 {
-    "fields": [{
-        "field": "user.name",
-        "like": "张三丰"
-    }]
+    "filters": {
+        "user.name": {
+            "like": "张三丰"
+        }
+    }
 }
 ```
 
@@ -113,11 +153,12 @@ GET /?price.value.$gte=9.0&price.value.$lt=9.5
 POST /search
 
 {
-    "fields": [{
-        "field": "price.value",
-        "gte": 9.0,
-        "lt": 9.5
-    }]
+    "filters": {
+        "price.value": {
+            "gte": 9.0,
+            "lt": 9.5
+        }
+    }
 }
 ```
 
@@ -131,11 +172,12 @@ GET /?createTime.$lt=2017-09-20&createTime.$gt=2017-09-19
 POST /search
 
 {
-    "fields": [{
-        "field": "createTime",
-        "lt": "2017-09-20",
-        "gt": "2017-09-19"
-    }]
+    "filters": {
+        "createTime": {
+            "lt": "2017-09-20",
+            "gt": "2017-09-19"
+        }
+    }
 }
 
 ```
@@ -150,28 +192,35 @@ GET /?status.$in=已删除,已失效
 POST /search
 
 {
-    "fields": [{
-        "field": "status",
-        "in": ["已删除", "已失效"]
-    }]
+    "filters": {
+        "status": {
+            "in": ["已删除", "已失效"]
+        }
+    }
 }
 ```
 
 ## 复合查询 ##
 
-默认多个查询之间是 `AND` 关系。
+默认多个查询的参数之间是 `AND` 关系。
+
+```http
+GET /?name.$like=张三&status=有效&createTime.$gte=2018-09-18
+```
 
 ```http
 POST /search
 
 {
-    "fields": [{
-        "field": "name",
-        "like": "张三"
-    }, {
-        "field": "createTime",
-        "gte": "2018-09-18"
-    }]
+    "filters": {
+        "name": {
+            "like": "张三"
+        },
+        "status": "有效",
+        "createTime": {
+            "gte": "2018-09-18"
+        }
+    }
 }
 
 ```

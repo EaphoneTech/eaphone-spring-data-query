@@ -10,8 +10,9 @@ import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
 
 import com.eaphonetech.common.datatables.model.mapping.ColumnType;
-import com.eaphonetech.common.datatables.model.mapping.QueryField;
 import com.eaphonetech.common.datatables.model.mapping.QueryInput;
+import com.eaphonetech.common.datatables.model.mapping.filter.QueryField;
+import com.eaphonetech.common.datatables.model.mapping.filter.QueryFilter;
 
 abstract class AbstractPredicateBuilder<T> {
     protected final QueryInput input;
@@ -30,15 +31,14 @@ abstract class AbstractPredicateBuilder<T> {
     }
 
     private void initTree(QueryInput input) {
-        for (Map.Entry<String, QueryField> entry : input.getFields().entrySet()) {
+        for (Map.Entry<String, QueryField> entry : input.getFilters().entrySet()) {
             final String fieldName = entry.getKey();
             final QueryField field = entry.getValue();
             addChild(tree, 0, fieldName.split("\\."), ColumnType.parse(field.getType()), field);
         }
     }
 
-    private void addChild(Node<Filter> parent, int index, String[] names, ColumnType type,
-            com.eaphonetech.common.datatables.model.mapping.Filter filter) {
+    private void addChild(Node<Filter> parent, int index, String[] names, ColumnType type, QueryFilter filter) {
         boolean isLast = index + 1 == names.length;
         if (isLast) {
             Node<Filter> child = new Node<Filter>(names[index], new ColumnFilter(type, filter));

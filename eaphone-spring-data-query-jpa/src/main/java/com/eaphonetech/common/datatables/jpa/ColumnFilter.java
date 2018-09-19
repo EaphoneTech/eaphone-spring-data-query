@@ -10,6 +10,7 @@ import javax.persistence.criteria.Predicate;
 
 import com.eaphonetech.common.datatables.jpa.columns.AbstractColumnTypeDecorator;
 import com.eaphonetech.common.datatables.model.mapping.ColumnType;
+import com.eaphonetech.common.datatables.model.mapping.filter.QueryFilter;
 import com.querydsl.core.types.Ops;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
@@ -17,9 +18,9 @@ import com.querydsl.core.types.dsl.PathBuilder;
 
 class ColumnFilter extends GlobalFilter implements Filter {
     private final ColumnType type;
-    private com.eaphonetech.common.datatables.model.mapping.Filter filter;
+    private QueryFilter filter;
 
-    ColumnFilter(ColumnType type, com.eaphonetech.common.datatables.model.mapping.Filter filter) {
+    ColumnFilter(ColumnType type, QueryFilter filter) {
         super(filter.getEq());
         this.type = type;
         this.filter = filter;

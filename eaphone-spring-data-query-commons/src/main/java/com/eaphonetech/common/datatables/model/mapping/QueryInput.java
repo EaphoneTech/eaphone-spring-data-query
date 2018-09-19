@@ -7,6 +7,8 @@ import java.util.Map;
 
 import javax.validation.constraints.Min;
 
+import com.eaphonetech.common.datatables.model.mapping.filter.QueryField;
+
 import lombok.Data;
 
 @Data
@@ -50,15 +52,7 @@ public class QueryInput {
     /**
      * Per-column search parameter
      */
-    private Map<String, QueryField> fields = new HashMap<>();
-
-    /**
-     * 
-     * @return a {@link Map} of {@link QueryField} indexed by name
-     */
-    public Map<String, QueryField> getFieldsAsMap() {
-        return fields;
-    }
+    private Map<String, QueryField> filters = new HashMap<>();
 
     /**
      * Find a column by its name
@@ -70,8 +64,8 @@ public class QueryInput {
         if (columnName == null) {
             return null;
         }
-        if (this.fields.containsKey(columnName)) {
-            QueryField qf = this.fields.get(columnName);
+        if (this.filters.containsKey(columnName)) {
+            QueryField qf = this.filters.get(columnName);
             qf.setField(columnName);
             return qf;
         }
@@ -79,9 +73,9 @@ public class QueryInput {
     }
 
     public void addField(QueryField qf) {
-        if (this.fields == null) {
-            this.fields = new HashMap<>();
+        if (this.filters == null) {
+            this.filters = new HashMap<>();
         }
-        this.fields.put(qf.getField(), qf);
+        this.filters.put(qf.getField(), qf);
     }
 }
