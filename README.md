@@ -20,7 +20,7 @@ This project is inspired from [darrachequesne/spring-data-jpa-datatables](https:
 </dependency>
 ```
 
-OR:
+OR for MongoDB:
 
 ```xml
 <dependency>
@@ -35,24 +35,32 @@ OR:
 In any `@Configuration` class, add:
 
 ```java
-@EnableMongoRepositories(repositoryFactoryBeanClass = DataTablesRepositoryFactoryBean.class)
+@EnableMongoRepositories(repositoryFactoryBeanClass = EaphoneQueryRepositoryFactoryBean.class)
 ```
 
-### Write new Repo ###
+### Write new Repository ###
 
 Just as spring-data does:
 
 ```java
 @Repository
-public interface UserRepository extends DataTablesRepository<Order, String> {
+public interface UserRepository extends JpaQueryRepository<Order, Long> {
 }
 ```
 
-Note that `DataTablesRepository` extends `PagingAndSortingRepository` so it already contains functionalities like `findAll(Pageable)` and `save()`.
+OR for MongoDB: 
+
+```java
+@Repository
+public interface UserRepository extends MongoDBQueryRepository<Order, String> {
+}
+```
+
+Note that `EaphoneQueryRepository` extends `PagingAndSortingRepository` so it already contains functionalities like `findAll(Pageable)` and `save()`.
 
 ### Expose fields on view ###
 
-Only fields marked with `@JsonView(DataTablesOutput.View.class)` will be displayed in output.
+In many cases the data grid shows only part of all fields. In this scenario you can add `@JsonView(QueryOutput.View.class)` to your controller and entity, so only fields marked with `@JsonView(QueryOutput.View.class)` will be displayed in query output.
 
 ```java
 @Data
@@ -60,48 +68,54 @@ Only fields marked with `@JsonView(DataTablesOutput.View.class)` will be display
 public class Order {
 
     @Id
-    @JsonView(DataTablesOutput.View.class)
+    @JsonView(QueryOutput.View.class)
     private String id;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @JsonView(DataTablesOutput.View.class)
+    @JsonView(QueryOutput.View.class)
     private Date date;
 
-    @JsonView(DataTablesOutput.View.class)
+    @JsonView(QueryOutput.View.class)
     private String orderNumber;
 
-    @JsonView(DataTablesOutput.View.class)
+    @JsonView(QueryOutput.View.class)
     private boolean isValid;
 
-    @JsonView(DataTablesOutput.View.class)
-    private int amount;
-
-    @JsonView(DataTablesOutput.View.class)
+    @JsonView(QueryOutput.View.class)
     private double price;
+    
+    /** the detail will not show in query result */
+    private EmbeddedOrderDetail detail;
 }
 ```
 
 ### On the browser side ###
 
-Include `jquery.spring-friendly.js` so `column[0][data]` is changed to `column[0].data` and is correctly parsed by SpringMVC.
+A special designed data grid is designed for this protocol, will be introduced later.
 
 ### On the Server Side ###
 
-The repository has the following methods:
+A repository has the following methods:
 
 * Using Query
-  * `DataTablesOutput<T> findAll(DataTablesInput input);`
-  * `DataTablesOutput<T> findAll(DataTablesInput input, Criteria additionalCriteria);`
-  * `DataTablesOutput<T> findAll(DataTablesInput input, Criteria additionalCriteria, Criteria preFilteringCriteria);`
+  * `QueryOutput<T> findAll(QueryInput input);` for basic simple query
+  * `<R> QueryOutput<R> findAll(QueryInput input, Function<T, R> converter);` for query with customized data convert
+* Using Specification (JPA only)
+  * `QueryOutput<T> findAll(QueryInput input, Specification<T> additionalSpecification);`
+  * `QueryOutput<T> findAll(QueryInput input, Specification<T> additionalSpecification, Specification<T> preFilteringSpecification);`
+  * `<R> QueryOutput<R> findAll(QueryInput input, Specification<T> additionalSpecification, Specification<T> preFilteringSpecification, Function<T, R> converter);`
+* Using Criteria (MongoDB only)
+  * `QueryOutput<T> findAll(QueryInput input, Criteria additionalCriteria);`
+  * `QueryOutput<T> findAll(QueryInput input, Criteria additionalCriteria, Criteria preFilteringCriteria);`
 * Using Aggregation (MongoDB only)
-  * `<View> DataTablesOutput<View> findAll(Class<View> classOfView, DataTablesInput input, AggregationOperation... operations);`
-  * `<View> DataTablesOutput<View> findAll(Class<View> classOfView, DataTablesInput input, Collection<? extends AggregationOperation> operations);`
+  * `<View> QueryOutput<View> findAll(Class<View> classOfView, QueryInput input, AggregationOperation... operations);`
+  * `<View> QueryOutput<View> findAll(Class<View> classOfView, QueryInput input, Collection<? extends AggregationOperation> operations);`
 
 ### Examples ###
 
 ```java
 @GetMapping("/data/orders")
-public DataTablesOutput<Order> getOrders(@Valid DataTablesInput input) {
+public QueryOutput<Order> getOrders(@Valid QueryInput input) {
     return repo.findAll(input);
 }
 ```
@@ -112,7 +126,7 @@ public DataTablesOutput<Order> getOrders(@Valid DataTablesInput input) {
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 @GetMapping("/")
-public DataTablesOutput<DataView> getAll(@Valid DataTablesInput input) {
+public QueryOutput<DataView> getAll(@Valid QueryInput input) {
     return repo.findAll(DataView.class,
         input,
         // just provide your aggregation pipeline here
@@ -128,11 +142,9 @@ public DataTablesOutput<DataView> getAll(@Valid DataTablesInput input) {
 }
 ```
 
-## Additional usage: Filter ##
+## More details on QueryInput ##
 
-In addition to DataTables' `columns[x].search` parameters, `columns[x].filter` is a new way to define more complex queries.  
-
-A more detailed document in Simplified Chinese (zh_CN) is provided [here](doc/DataTablesInput.zh-CN.md).
+A more detailed document in Simplified Chinese (zh_CN) is provided [here](doc/Query.zh-CN.md).
 
 ## Future Plans ##
 
@@ -145,6 +157,5 @@ In the near future:
 
 * `$match`, `$sum: 1`, `$limit` and `$skip` are attached to given aggregation pipeline so in some cases the logic may be broken.
 * Text search is simply converted to Regular Expressions with `Literal` flag and may contain some logical flaws.
-* Global search is NOT implementd yet (as discussed in #1).
-* Querydsl support is REMOVED, as my own project does not use it.
+* Querydsl support is missing, as my own project does not use it.
 

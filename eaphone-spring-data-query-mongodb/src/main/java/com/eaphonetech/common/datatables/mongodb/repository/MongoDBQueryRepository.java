@@ -19,14 +19,6 @@ public interface MongoDBQueryRepository<T, ID extends Serializable> extends Eaph
      * Returns the filtered list for the given {@link QueryInput}.
      *
      * @param input the {@link QueryInput} mapped from the Ajax request
-     * @return a {@link QueryOutput}
-     */
-    QueryOutput<T> findAll(QueryInput input);
-
-    /**
-     * Returns the filtered list for the given {@link QueryInput}.
-     *
-     * @param input the {@link QueryInput} mapped from the Ajax request
      * @param additionalSpecification an additional {@link Criteria} to apply to the query
      *            (with an "AND" clause)
      * @return a {@link QueryOutput}
