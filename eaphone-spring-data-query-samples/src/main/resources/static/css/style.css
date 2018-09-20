@@ -1,0 +1,13 @@
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+}
+
+.container-fluid {
+    min-height: 100%;
+}
+
+#input-post-data {
+    min-height: 200px;
+}

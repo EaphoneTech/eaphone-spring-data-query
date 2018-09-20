@@ -1,36 +1,81 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Eaphone Query Example</title>
-<link rel="stylesheet" href="/webjars/bootstrap/css/bootstrap.min.css" />
-<link rel="stylesheet" href="css/style.css">
+  <title>Eaphone Query Example</title>
+  <!--
+  <link rel="stylesheet" href="/webjars/bootstrap/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/webjars/highlightjs/styles/solarized-light.css" />
+  -->
+  <link href="https://cdn.bootcss.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/solarized-light.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
-  <div class="container">
-    <div class="row">
+  <nav class="navbar navbar-light bg-light">
+    <a class="navbar-brand" href="#">Eaphone</a>
+  </nav>
+  <div class="container-fluid">
+    <div class="row mh-100">
       <div class="col">
-        <textarea id="input_post_data"></textarea>
+        <form>
+          <div class="form-group">
+            <label for="input-post-data">Data to POST:</label>
+            <textarea id="input-post-data" class="form-control text-monospace">
+{
+  "filters": {
+      "orderNumber": {
+          "eq": "O10001"
+      }
+  }
+}
+            </textarea>
+          </div>
+          <div class="form-group">
+            <button type="button" class="btn btn-outline-primary">Example 1</button>
+            <button type="button" class="btn btn-outline-primary">Example 2</button>
+            <button type="button" class="btn btn-outline-primary">Example 3</button>
+            <button type="button" class="btn btn-outline-primary">Example 4</button>
+            <button type="submit" class="btn btn-primary float-right" id="btn-post">POST</button>
+          </div>
+        </form>
       </div>
       <div class="col">
-        <table>
+        <table class="table table-bordered">
           <thead>
             <tr>
-              <th>id</th>
-              <th>date</th>
-              <th>orderNumber</th>
-              <th>isValid</th>
-              <th>amount</th>
-              <th>price</th>
+              <th scope="col">id</th>
+              <th scope="col">date</th>
+              <th scope="col">orderNumber</th>
+              <th scope="col">isValid</th>
+              <th scope="col">amount</th>
+              <th scope="col">price</th>
             </tr>
           </thead>
-          <tbody id="table_body"></tbody>
+          <tbody id="table-body"></tbody>
         </table>
-        <div id="server_response"></div>
+        <ul class="pagination justify-content-center" id="pagination">
+          <li class="page-item"><a href="#" class="page-link">1</a></li>
+          <li class="page-item"><a href="#" class="page-link">2</a></li>
+          <li class="page-item"><a href="#" class="page-link">3</a></li>
+          <li class="page-item"><a href="#" class="page-link">4</a></li>
+        </ul>
+        <div>
+          <pre><code id="server-response" class="json"></code></pre>
+        </div>
       </div>
     </div>
   </div>
+  <!--
   <script type="text/javascript" src="/webjars/jquery/jquery.min.js"></script>
   <script type="text/javascript" src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="/webjars/highlightjs/highlight.min.js"></script>
+  -->
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdn.bootcss.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
   <script type="text/javascript" src="/js/index.js"></script>
 </body>
+
 </html>
