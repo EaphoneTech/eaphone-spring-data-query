@@ -9,7 +9,7 @@
 
 为了便于操作，提供了如下几种方式：
 
-1. 在 GET 接口上通过 query 方式即 `?firstname=Dave&lastname=Matthews` 进行简单的查询。
+1. 在 GET 接口上通过 query 方式即 `?firstname=Dave&lastname=Matthews` 进行简单的查询 （尚未实现）。
 2. 在 POST 接口上通过 `@RequestBody` 方式传入较为完整的查询内容
 
 ```json
@@ -44,9 +44,11 @@
 }
 ```
 
-## 实例 ##
+## 示例 ##
 
-为了增强可读性，下面的请求认为在 `@GetMapping("/")` 上进行，并且参数都没有进行转码。
+为了增强可读性，下面的请求认为在 `@RequestMapping("/")` 上进行，并且 GET 参数都没有进行转码。
+
+注意： GET 操作目前暂时还不支持。
 
 ### 最简单的请求 ###
 
