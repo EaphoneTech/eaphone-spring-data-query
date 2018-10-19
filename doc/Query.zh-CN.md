@@ -218,7 +218,9 @@ POST /search
         "name": {
             "like": "张三"
         },
-        "status": "有效",
+        "status": {
+            "eq": "有效"
+        },
         "createTime": {
             "gte": "2018-09-18"
         }
