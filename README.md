@@ -6,7 +6,13 @@ This is a [sample project](eaphone-spring-data-query-samples) showing how it wor
 
 This project is inspired from [darrachequesne/spring-data-jpa-datatables](https://github.com/darrachequesne/spring-data-jpa-datatables/), which works with spring-data-jpa.
 
+## Quick view ##
+
+![screen cast from sample project](doc/quickview.gif)
+
 ## Usage ##
+
+A short but working [example](eaphone-spring-data-query-samples).
 
 ### Introduce into project ###
 
@@ -144,18 +150,17 @@ public QueryOutput<DataView> getAll(@Valid QueryInput input) {
 
 ## More details on QueryInput ##
 
-A more detailed document in Simplified Chinese (zh_CN) is provided [here](doc/Query.zh-CN.md).
+A more detailed document is [here](doc/Query.md), and with [中文版](doc/Query.zh-CN.md).
 
 ## Future Plans ##
 
 In the near future:
 
-* In Criteria converting, more types (Date) must be handled, as currently only `String` and `Boolean` are handled
-* More tests (and verifications)
+* More complicated tests (and verifications)
 
 ## Known Issues ##
 
 * `$match`, `$sum: 1`, `$limit` and `$skip` are attached to given aggregation pipeline so in some cases the logic may be broken.
 * Text search is simply converted to Regular Expressions with `Literal` flag and may contain some logical flaws.
-* Querydsl support is missing, as my own project does not use it.
+* Querydsl support may be missing or error-prone, as my project does not use it.
 

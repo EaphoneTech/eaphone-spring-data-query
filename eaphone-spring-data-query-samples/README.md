@@ -6,11 +6,21 @@ The original sample project is [darrachequesne/spring-data-jpa-datatables-sample
 
 ## How to run ##
 
+(Not verified)
+
 ```
 mvn spring-boot:run
 ```
 
 The project will start at `http://localhost:8080/`.
+
+## What is this? ##
+
+This project shows how to use eaphone-spring-data-query in your project, and a very basic version of JavaScript grid.
+
+The web page contains three parts: request (and examples), raw response and rendered grid.
+
+![screen cast](../doc/quickview.gif)
 
 ## Features ##
 

@@ -1,16 +1,16 @@
-# 关于查询 #
+# Why #
 
-在实际操作中，在 DataTables 的通信协议的基础上，遇到了一些不足，主要有以下方面：
+I use DataTables in some projects and wrote SpringMVC server side for it. Later the frontend is rewritten and DataTables is no longer used. Now is the time to refine the protocol for general data-grid query. 
 
-* 通过 `columns[i][search][value]` 实现的按列搜索功能，不能指定范围。比如 “指定日期范围” 或者 “大于 xx 的值” 这种场景，无法在统一的一个通信协议里传递
-* 通过 `columns[i][search][regex]` 只能指定 `普通搜索` 和 `按正则表达式搜索` 两种场景，
+* You can not assign a range via `columns[i][search][value]`, as in SQL: `BETWEEN`.
+* You can only do regular search OR regex search via `columns[i][search][regex]`, but not `=`, `LIKE`.
 
-## 查询方式 ##
+## Query ##
 
-为了便于操作，提供了如下几种方式：
+Two query methods are designed as follows:
 
-1. 在 GET 接口上通过 query 方式即 `?firstname=Dave&lastname=Matthews` 进行简单的查询 （尚未实现）。
-2. 在 POST 接口上通过 `@RequestBody` 方式传入较为完整的查询内容
+1. Using HTTP GET , as `?firstname=Dave&lastname=Matthews` (NOTE: Not Implemented Yet);
+2. Using HTTP POST, as `@RequestBody`:
 
 ```json
 {
@@ -44,15 +44,13 @@
 }
 ```
 
-## 示例 ##
+## Examples ##
 
-为了增强可读性，下面的请求认为在 `@RequestMapping("/")` 上进行，并且 GET 参数都没有进行转码。
+In order to increase readability, all query strings in following HTTP GET examples are not escaped. (And they are NOT supported yet).
 
-注意： GET 操作目前暂时还不支持。
+### Basic Query ###
 
-### 最简单的请求 ###
-
-因为 `draw`, `start`, `length`, `orders`, `filters` 全都改为可选的，因此最简单的请求就变成了
+None of the `draw`, `start`, `length`, `orders`, `filters` are required, so the basic query is:
 
 ```http
 GET /
@@ -64,11 +62,11 @@ POST /search
 {}
 ```
 
-即：不需要任何参数。
+e.g. NO parameters are needed.
 
-### 分页 ###
+### Pagination ###
 
-单纯分页只需要传入 `start` 和 `length` 。（当然如果 `length` 和后端一致的话也可以不传了）
+Paging is controlled by `start` and `length`, which is the same as `SKIP` and `LIMIT`. 
 
 ```http
 GET /?start=30&length=10
@@ -83,9 +81,9 @@ POST /search
 }
 ```
 
-### 按某一列排序 ###
+### Ordering ###
 
-最简单的排序：
+Ordering by one column:
 
 ```http
 GET /?$order=price.value,desc
@@ -102,7 +100,7 @@ POST /search
 }
 ```
 
-稍微复杂一些的排序（请注意排序的顺序是有意义的，因此使用数组形式）：
+Ordering by more columns: 
 
 ```http
 GET /?$order=price.value,desc&$order=createTime,desc
@@ -122,10 +120,10 @@ POST /search
 }
 ```
 
-### 按某一列精确搜索 ###
+### Accurate Search ###
 
 ```http
-GET /?user.name=张三丰
+GET /?user.name=JamesBond
 ```
 
 ```http
@@ -134,18 +132,18 @@ POST /search
 {
     "filters": {
         "user.name": {
-            "eq": "张三丰"
+            "eq": "JamesBond"
         }
     }
 }
 ```
 
-### 按某一列筛选 ###
+### Filtering ###
 
-* 模糊查询
+* Like (`LIKE %value%`)
 
 ```http
-GET /?user.name.$like=张三丰
+GET /?user.name.$like=JamesBond
 ```
 
 ```http
@@ -154,13 +152,13 @@ POST /search
 {
     "filters": {
         "user.name": {
-            "like": "张三丰"
+            "like": "JamesBond"
         }
     }
 }
 ```
 
-* 按数值范围
+* Numerical Range
 
 ```http
 GET /?price.value.type=double&price.value.$gte=9.0&price.value.$lt=9.5
@@ -180,7 +178,7 @@ POST /search
 }
 ```
 
-* 按时间范围
+* Date Range & Time Range
 
 ```http
 GET /?createTime.type=date&createTime.$lt=2017-09-20&createTime.$gt=2017-09-19
@@ -198,13 +196,12 @@ POST /search
         }
     }
 }
-
 ```
 
-* 按枚举 (及 `$in` 操作)
+* In
 
 ```http
-GET /?status.$in=已删除,已失效
+GET /?status.$in=Deleted,Invalid
 ```
 
 ```http
@@ -213,18 +210,18 @@ POST /search
 {
     "filters": {
         "status": {
-            "in": ["已删除", "已失效"]
+            "in": ["Deleted", "Invalid"]
         }
     }
 }
 ```
 
-## 复合查询 ##
+## Multiple Filters ##
 
-默认多个查询的参数之间是 `AND` 关系。
+Multiple filters are joined by `AND` logic.
 
 ```http
-GET /?name.$like=张三&status=有效&createTime.$type=date&createTime.$gte=2018-09-18
+GET /?name.$like=JamesBond&status=Valid&createTime.$type=date&createTime.$gte=2018-09-18
 ```
 
 ```http
@@ -233,10 +230,10 @@ POST /search
 {
     "filters": {
         "name": {
-            "like": "张三"
+            "like": "JamesBond"
         },
         "status": {
-            "eq": "有效"
+            "eq": "Valid"
         },
         "createTime": {
             "type": "date"
@@ -247,6 +244,6 @@ POST /search
 
 ```
 
-## 参考 ##
+## References ##
 
-* [DataTables: Server-side processing](https://datatables.net/manual/server-side) 和相应的 [中文版](http://datatables.club/manual/server-side.html)
+* [DataTables: Server-side processing](https://datatables.net/manual/server-side)
