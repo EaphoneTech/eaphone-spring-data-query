@@ -80,14 +80,18 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
     }
 
     private <S extends T> Page<S> findAll(Query q, Pageable p, Class<S> classOfS) {
-        q.with(p);
-
         long count = mongoOperations.count(q, this.entityInformation.getCollectionName());
 
         if (count == 0) {
             return new PageImpl<S>(Collections.<S> emptyList());
         }
-
+        if (p != null) {
+            if (p.getSort() == null) {
+                q.limit(p.getPageSize()).skip(p.getOffset());
+            } else {
+                q.with(p);
+            }
+        }
         return new PageImpl<S>(mongoOperations.find(q, classOfS, this.entityInformation.getCollectionName()), p, count);
     }
 
@@ -103,7 +107,8 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
      * @param converter
      * @return
      */
-    public <R> QueryOutput<R> findAll(QueryInput input, Criteria additionalCrit, Criteria preFilteringCrit, Function<T, R> converter) {
+    public <R> QueryOutput<R> findAll(QueryInput input, Criteria additionalCrit, Criteria preFilteringCrit,
+            Function<T, R> converter) {
         QueryOutput<R> output = new QueryOutput<R>();
         output.setDraw(input.getDraw());
 
@@ -193,8 +198,7 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
             QueryInput input, AggregationOperation... operations) {
         final Pageable pageable = QueryUtils.getPageable(input);
 
-        final TypedAggregation<View> aggWithPage = QueryUtils.makeAggregation(classOfView, input, pageable,
-                operations);
+        final TypedAggregation<View> aggWithPage = QueryUtils.makeAggregation(classOfView, input, pageable, operations);
 
         final TypedAggregation<QueryCount> aggCount = QueryUtils.makeAggregationCountOnly(entityInformation, input,
                 operations);

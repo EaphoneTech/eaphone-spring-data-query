@@ -7,8 +7,9 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,7 +34,7 @@ public class OrderRestController {
     private OrderRepository repo;
 
     @JsonView(QueryOutput.View.class)
-    @RequestMapping(value = "/data/orders", method = RequestMethod.GET)
+    @GetMapping("/data/orders")
     public QueryOutput<Order> getOrders(@Valid QueryInput input, @RequestParam(required = false) Date startDate,
             @RequestParam(required = false) Date endDate) {
         boolean preFiltering = false;
@@ -53,6 +54,12 @@ public class OrderRestController {
         } else {
             return repo.findAll(input);
         }
+    }
+
+    @JsonView(QueryOutput.View.class)
+    @PostMapping("/data/orders")
+    public QueryOutput<Order> getOrdersByPost(@Valid @RequestBody QueryInput input) {
+        return repo.findAll(input);
     }
 
     /**
