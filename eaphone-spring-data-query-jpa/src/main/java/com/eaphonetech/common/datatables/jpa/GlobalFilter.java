@@ -17,7 +17,11 @@ class GlobalFilter implements Filter {
     private final String escapedRawValue;
 
     GlobalFilter(String filterValue) {
-        escapedRawValue = escapeValue(filterValue);
+        if (filterValue == null) {
+            escapedRawValue = "";
+        } else {
+            escapedRawValue = escapeValue(filterValue);
+        }
     }
 
     String nullOrTrimmedValue(String value) {

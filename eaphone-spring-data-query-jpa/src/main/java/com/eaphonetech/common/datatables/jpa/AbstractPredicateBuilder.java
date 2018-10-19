@@ -57,8 +57,11 @@ abstract class AbstractPredicateBuilder<T> {
     public Pageable createPageable() {
         List<Sort.Order> orders = new ArrayList<>();
         for (com.eaphonetech.common.datatables.model.mapping.QueryOrder order : input.getOrders()) {
-            QueryField field = input.getField(order.getField());
-            String sortColumn = field.getField();
+            String sortColumn = order.getField();
+            QueryField inputField = input.getField(order.getField());
+            if (inputField != null) {
+                sortColumn = inputField.getField();
+            }
             Sort.Direction sortDirection = Sort.Direction.fromString(order.getDir());
             orders.add(new Sort.Order(sortDirection, sortColumn));
         }
