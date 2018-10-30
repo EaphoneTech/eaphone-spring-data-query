@@ -51,8 +51,7 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
     public <R> QueryOutput<R> findAll(QueryInput input, Specification<T> additionalSpecification,
             Specification<T> preFilteringSpecification, Function<T, R> converter) {
         QueryOutput<R> output = new QueryOutput<>();
-        output.setDraw(input.getDraw());
-        if (input.getLength() == 0) {
+        if (input.getLimit() == 0) {
             return output;
         }
 

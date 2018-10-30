@@ -11,15 +11,6 @@ import lombok.Data;
 public class QueryOutput<T> {
 
   /**
-   * The draw counter that this object is a response to - from the draw parameter sent as part of
-   * the data request. Note that it is strongly recommended for security reasons that you cast this
-   * parameter to an integer, rather than simply echoing back to the client what it sent in the draw
-   * parameter, in order to prevent Cross Site Scripting (XSS) attacks.
-   */
-  @JsonView(View.class)
-  private int draw;
-
-  /**
    * Total records, before filtering (i.e. the total number of records in the database)
    */
   @JsonView(View.class)

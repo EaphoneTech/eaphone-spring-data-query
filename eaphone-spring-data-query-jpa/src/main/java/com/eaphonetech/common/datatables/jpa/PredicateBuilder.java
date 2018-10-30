@@ -31,9 +31,6 @@ public class PredicateBuilder extends AbstractPredicateBuilder<Predicate> {
             if (hasColumnFilter) {
                 Filter columnFilter = node.getData();
                 columnPredicates.add(columnFilter.createPredicate(pathBuilder, node.getName()));
-            } else if (hasGlobalFilter) {
-                Filter globalFilter = tree.getData();
-                globalPredicates.add(globalFilter.createPredicate(pathBuilder, node.getName()));
             }
         }
         for (Node<Filter> child : node.getChildren()) {

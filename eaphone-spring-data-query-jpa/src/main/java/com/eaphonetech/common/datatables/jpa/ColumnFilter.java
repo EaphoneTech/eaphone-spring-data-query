@@ -21,7 +21,7 @@ class ColumnFilter extends GlobalFilter implements Filter {
     private QueryFilter filter;
 
     ColumnFilter(ColumnType type, QueryFilter filter) {
-        super(filter.getEq());
+        super(filter.get_eq());
         this.type = type;
         this.filter = filter;
     }
