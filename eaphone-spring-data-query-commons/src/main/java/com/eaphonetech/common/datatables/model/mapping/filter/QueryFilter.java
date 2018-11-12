@@ -4,17 +4,17 @@ import lombok.Data;
 
 @Data
 public class QueryFilter {
-    private String gt;
-    private String gte;
-    private String lt;
-    private String lte;
-    private String eq;
-    private String ne;
-    private String in;
-    private String nin;
-    private String regex;
-    private String like;
-    private Boolean exists;
-    private Boolean isNull;
-    private Boolean isEmpty;
+    private String _gt;
+    private String _gte;
+    private String _lt;
+    private String _lte;
+    private String _eq;
+    private String _ne;
+    private String _in;
+    private String _nin;
+    private String _regex;
+    private String _like;
+    private Boolean _exists;
+    private Boolean _null;
+    private Boolean _empty;
 }
