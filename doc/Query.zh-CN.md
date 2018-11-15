@@ -7,38 +7,35 @@
 
 ## 查询方式 ##
 
-为了便于操作，提供了如下几种方式：
-
-1. 在 GET 接口上通过 query 方式即 `?firstname=Dave&lastname=Matthews` 进行简单的查询 （尚未实现）。
-2. 在 POST 接口上通过 `@RequestBody` 方式传入较为完整的查询内容
+建议在 POST 接口上通过 `@RequestBody` 方式传入较为完整的查询内容。
 
 ```json
 {
     "draw": 1,
-    "start": 0,
-    "length": 10,
-    "orders": [{
+    "offset": 0,
+    "limit": 10,
+    "order_by": [{
         "field": "field1",
         "dir": "asc"
     }, {
         "field": "field2",
         "dir": "desc"
     }],
-    "filters": {
+    "where": {
         "field1": {
-            "gt": "",
-            "gte": "",
-            "lt": "",
-            "lte": "",
-            "eq": "",
-            "ne": "",
-            "in": [],
-            "nin": [],
-            "regex": "",
-            "like": "",
-            "exists": true,
-            "isNull": true,
-            "isEmpty": true
+            "_gt": "",
+            "_gte": "",
+            "_lt": "",
+            "_lte": "",
+            "_eq": "",
+            "_ne": "",
+            "_in": "",
+            "_nin": "",
+            "_regex": "",
+            "_like": "",
+            "_exists": true,
+            "_isNull": true,
+            "_isEmpty": true
         }
     }
 }
@@ -46,17 +43,9 @@
 
 ## 示例 ##
 
-为了增强可读性，下面的请求认为在 `@RequestMapping("/")` 上进行，并且 GET 参数都没有进行转码。
-
-注意： GET 操作目前暂时还不支持。
-
 ### 最简单的请求 ###
 
-因为 `draw`, `start`, `length`, `orders`, `filters` 全都改为可选的，因此最简单的请求就变成了
-
-```http
-GET /
-```
+因为 `draw`, `offset`, `limit`, `order_by`, `where` 全都改为可选的，因此最简单的请求就变成了
 
 ```http
 POST /search
@@ -68,18 +57,14 @@ POST /search
 
 ### 分页 ###
 
-单纯分页只需要传入 `start` 和 `length` 。（当然如果 `length` 和后端一致的话也可以不传了）
-
-```http
-GET /?start=30&length=10
-```
+单纯分页只需要传入 `offset` 和 `limit` 。（当然如果 `limit` 和后端一致的话也可以不传了）
 
 ```http
 POST /search
 
 {
-    "start": 30,
-    "length": 10
+    "offset": 30,
+    "limit": 10
 }
 ```
 
@@ -88,14 +73,10 @@ POST /search
 最简单的排序：
 
 ```http
-GET /?$order=price.value,desc
-```
-
-```http
 POST /search
 
 {
-    "orders": [{
+    "order_by": [{
         "field": "price.value",
         "dir": "desc"
     }]
@@ -105,14 +86,10 @@ POST /search
 稍微复杂一些的排序（请注意排序的顺序是有意义的，因此使用数组形式）：
 
 ```http
-GET /?$order=price.value,desc&$order=createTime,desc
-```
-
-```http
 POST /search
 
 {
-    "orders": [{
+    "order_by": [{
         "field": "price.value",
         "dir": "asc"
     }, {
@@ -122,39 +99,31 @@ POST /search
 }
 ```
 
-### 按某一列精确搜索 ###
+### 按某一列筛选 ###
 
-```http
-GET /?user.name=张三丰
-```
+* 精确查询
 
 ```http
 POST /search
 
 {
-    "filters": {
+    "where": {
         "user.name": {
-            "eq": "张三丰"
+            "_eq": "张三丰"
         }
     }
 }
 ```
 
-### 按某一列筛选 ###
-
 * 模糊查询
-
-```http
-GET /?user.name.$like=张三丰
-```
 
 ```http
 POST /search
 
 {
-    "filters": {
+    "where": {
         "user.name": {
-            "like": "张三丰"
+            "_like": "张三%"
         }
     }
 }
@@ -163,18 +132,14 @@ POST /search
 * 按数值范围
 
 ```http
-GET /?price.value.type=double&price.value.$gte=9.0&price.value.$lt=9.5
-```
-
-```http
 POST /search
 
 {
-    "filters": {
+    "where": {
         "price.value": {
             "type": "double",
-            "gte": 9.0,
-            "lt": 9.5
+            "_gte": 9.0,
+            "_lt": 9.5
         }
     }
 }
@@ -183,18 +148,14 @@ POST /search
 * 按时间范围
 
 ```http
-GET /?createTime.type=date&createTime.$lt=2017-09-20&createTime.$gt=2017-09-19
-```
-
-```http
 POST /search
 
 {
-    "filters": {
+    "where": {
         "createTime": {
             "type": "date",
-            "lt": "2017-09-20",
-            "gt": "2017-09-19"
+            "_lt": "2017-09-20",
+            "_gt": "2017-09-19"
         }
     }
 }
@@ -204,16 +165,12 @@ POST /search
 * 按枚举 (及 `$in` 操作)
 
 ```http
-GET /?status.$in=已删除,已失效
-```
-
-```http
 POST /search
 
 {
-    "filters": {
+    "where": {
         "status": {
-            "in": ["已删除", "已失效"]
+            "_in": ["已删除", "已失效"]
         }
     }
 }
@@ -224,23 +181,19 @@ POST /search
 默认多个查询的参数之间是 `AND` 关系。
 
 ```http
-GET /?name.$like=张三&status=有效&createTime.$type=date&createTime.$gte=2018-09-18
-```
-
-```http
 POST /search
 
 {
-    "filters": {
+    "where": {
         "name": {
-            "like": "张三"
+            "_like": "张三%"
         },
         "status": {
-            "eq": "有效"
+            "_eq": "有效"
         },
         "createTime": {
             "type": "date"
-            "gte": "2018-09-18"
+            "_gte": "2018-09-18"
         }
     }
 }
