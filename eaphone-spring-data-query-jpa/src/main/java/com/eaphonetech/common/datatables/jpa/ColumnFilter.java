@@ -16,12 +16,11 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.PathBuilder;
 
-class ColumnFilter extends GlobalFilter implements Filter {
+class ColumnFilter implements Filter {
     private final ColumnType type;
     private QueryFilter filter;
 
     ColumnFilter(ColumnType type, QueryFilter filter) {
-        super(filter.getEq());
         this.type = type;
         this.filter = filter;
     }

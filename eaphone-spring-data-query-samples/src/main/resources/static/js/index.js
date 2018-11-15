@@ -15,9 +15,9 @@ $(document).ready(function () {
 		summary: 'Single text filter',
 		description: 'The most basic filter',
 		value: {
-			filters: {
+			where: {
 				orderNumber: {
-					eq: 'O10001'
+					'_eq': 'O10001'
 				}
 			}
 		}
@@ -25,65 +25,83 @@ $(document).ready(function () {
 		summary: 'Single comparison filter',
 		description: 'Comparison filter on single column',
 		value: {
-			filters: {
+			where: {
 				price: {
-					type: 'double',
-					lt: 20.5
+					'type': 'double',
+					'_lt': 20.5
+				}
+			}
+		}
+	}, {
+		summary: 'Enumeration (in)',
+		description: 'Enumeration with string',
+		value: {
+			where: {
+				orderNumber: {
+					'_in': ['O10001', 'O10002']
+				}
+			}
+		}
+	}, {
+		summary: 'Enumeration (in)',
+		description: 'Enumeration with number',
+		value: {
+			where: {
+				amount: {
+					"type": "integer",
+					'_in': [5, 9, 13]
 				}
 			}
 		}
 	}, {
 		summary: 'Range filter on one column',
-		description: 'More filters on single column',
+		description: 'More where on single column',
 		value: {
-			filters: {
+			where: {
 				price: {
-					type: 'double',
-					gte: 10,
-					lt: 20.5
+					'type': 'double',
+					'_gte': 10,
+					'_lt': 20.5
 				}
 			}
 		}
 	}, {
 		summary: 'Multiple columns',
-		description: 'More filters on multiple columns',
+		description: 'More where on multiple columns',
 		value: {
-			filters: {
+			where: {
 				date: {
-					type: 'date',
-					gt: '2012-01-01'
+					'type': 'date',
+					'_gt': '2012-01-01'
 				},
 				price: {
-					type: 'double',
-					gte: 10,
-					lt: 20.5
+					'type': 'double',
+					'_gte': 10,
+					'_lt': 20.5
 				}
 			}
 		}
 	}, {
 		summary: 'Pagination',
-		description: 'Customize page size and start page',
+		description: 'Customize page size and offset page',
 		value: {
-			filters: {
+			where: {
 				price: {
-					type: 'double',
-					gte: 10
+					'type': 'double',
+					'_gte': 10
 				}
 			},
-			start: 14,
-			length: 7
+			offset: 30,
+			limit: 10
 		}
 	}, {
 		summary: 'Orders',
 		description: 'Multiple orders',
 		value: {
-			orders: [{
-				field: 'amount',
-				dir: 'desc'
-			}, {
-				field: 'price',
-				dir: 'asc'
-			}]
+			order_by: {
+				'amount': 'desc',
+				'price': 'asc'
+			}
 		}
 	}];
 	
@@ -100,9 +118,8 @@ $(document).ready(function () {
 	
 	/** default value that will apply to each request if not being overridden */
 	const DEFAULT = {
-		draw: 1,
-		start: 0,
-		length: 10
+		offset: 0,
+		limit: 10
 	};
 
 	/** This is the (last successful) request model */
@@ -127,8 +144,8 @@ $(document).ready(function () {
 		});
 
 		// draw pagination
-		let currentPage = Math.ceil((model.start || DEFAULT.start) / (model.length || DEFAULT.length)) + 1;
-		let totalPage = Math.ceil(data.filtered / (model.length || DEFAULT.length));
+		let currentPage = Math.ceil((model.offset || DEFAULT.offset) / (model.limit || DEFAULT.limit)) + 1;
+		let totalPage = Math.ceil(data.filtered / (model.limit || DEFAULT.limit));
 		let startPage = Math.max(1, currentPage - 3);
 		let endPage = Math.min(currentPage + 3, totalPage);
 		for (let i = startPage; i <= endPage; i++) {
@@ -152,7 +169,7 @@ $(document).ready(function () {
 	let post = function (data) {
 		let jsonModel = JSON.parse(data);
 		$.ajax({
-			url: '/data/orders',
+			url: '/data/orders/search',
 			type: 'post',
 			data: data,
 			contentType: 'application/json; charset=UTF-8',
@@ -178,8 +195,8 @@ $(document).ready(function () {
 
 	/** all pagination links */
 	$('#pagination').on('click', 'a.page-link', function () {
-		let newStart = (Number.parseInt($(this).text()) - 1) * (model.length || DEFAULT.length);
-		model.start = newStart;
+		let newStart = (Number.parseInt($(this).text()) - 1) * (model.limit || DEFAULT.limit);
+		model.offset = newStart;
 		$postInput.val(JSON.stringify(model, null, 2));
 		$('#btn-post').click();
 		return false;

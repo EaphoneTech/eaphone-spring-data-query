@@ -54,7 +54,7 @@ public abstract class ColumnType {
         return result;
     }
 
-    public abstract Object tryConvert(String text);
+    public abstract Object tryConvert(Object o);
 
     static final class StringColumnType extends ColumnType {
         StringColumnType() {
@@ -62,8 +62,8 @@ public abstract class ColumnType {
         }
 
         @Override
-        public Object tryConvert(String text) {
-            return text;
+        public Object tryConvert(Object o) {
+            return o == null ? null : o.toString();
         }
     }
 
@@ -73,13 +73,13 @@ public abstract class ColumnType {
         }
 
         @Override
-        public Object tryConvert(String text) {
-            Object result = text;
+        public Object tryConvert(Object o) {
+            Object result = null;
             try {
-                Date parsedDate = DateParser.parse(text);
+                Date parsedDate = DateParser.parse(o.toString());
                 result = parsedDate;
             } catch (ParseException pe) {
-                result = text;
+                result = null;
             }
             return result;
         }
@@ -91,13 +91,13 @@ public abstract class ColumnType {
         }
 
         @Override
-        public Object tryConvert(String text) {
-            Object result = text;
+        public Object tryConvert(Object o) {
+            Object result = null;
             try {
-                Integer parsedInteger = Integer.parseInt(text);
+                Integer parsedInteger = Integer.parseInt(o.toString());
                 result = parsedInteger;
             } catch (NumberFormatException nfe) {
-                result = text;
+                result = null;
             }
             return result;
         }
@@ -109,13 +109,13 @@ public abstract class ColumnType {
         }
 
         @Override
-        public Object tryConvert(String text) {
-            Object result = text;
+        public Object tryConvert(Object o) {
+            Object result = null;
             try {
-                Double parsedDouble = Double.parseDouble(text);
+                Double parsedDouble = Double.parseDouble(o.toString());
                 result = parsedDouble;
             } catch (NumberFormatException nfe) {
-                result = text;
+                result = null;
             }
             return result;
         }
@@ -127,11 +127,8 @@ public abstract class ColumnType {
         }
 
         @Override
-        public Object tryConvert(String text) {
-            Object result = text;
-            Boolean parsedBoolean = Boolean.parseBoolean(text);
-            result = parsedBoolean;
-            return result;
+        public Object tryConvert(Object o) {
+            return o == null ? null : Boolean.parseBoolean(o.toString());
         }
     }
 

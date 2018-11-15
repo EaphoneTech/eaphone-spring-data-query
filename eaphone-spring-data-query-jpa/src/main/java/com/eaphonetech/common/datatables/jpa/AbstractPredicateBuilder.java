@@ -7,7 +7,6 @@ import java.util.Map;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
-import org.springframework.util.StringUtils;
 
 import com.eaphonetech.common.datatables.model.mapping.ColumnType;
 import com.eaphonetech.common.datatables.model.mapping.QueryInput;
@@ -16,22 +15,16 @@ import com.eaphonetech.common.datatables.model.mapping.filter.QueryFilter;
 
 abstract class AbstractPredicateBuilder<T> {
     protected final QueryInput input;
-    final boolean hasGlobalFilter;
     final Node<Filter> tree;
 
     AbstractPredicateBuilder(QueryInput input) {
         this.input = input;
-        this.hasGlobalFilter = input.getSearch() != null && StringUtils.hasText(input.getSearch().getValue());
-        if (this.hasGlobalFilter) {
-            tree = new Node<>(null, new GlobalFilter(input.getSearch().getValue()));
-        } else {
-            tree = new Node<>(null);
-        }
+        tree = new Node<>(null);
         initTree(input);
     }
 
     private void initTree(QueryInput input) {
-        for (Map.Entry<String, QueryField> entry : input.getFilters().entrySet()) {
+        for (Map.Entry<String, QueryField> entry : input.getWhere().entrySet()) {
             final String fieldName = entry.getKey();
             final QueryField field = entry.getValue();
             addChild(tree, 0, fieldName.split("\\."), ColumnType.parse(field.getType()), field);
@@ -56,34 +49,29 @@ abstract class AbstractPredicateBuilder<T> {
      */
     public Pageable createPageable() {
         List<Sort.Order> orders = new ArrayList<>();
-        for (com.eaphonetech.common.datatables.model.mapping.QueryOrder order : input.getOrders()) {
-            String sortColumn = order.getField();
-            QueryField inputField = input.getField(order.getField());
-            if (inputField != null) {
-                sortColumn = inputField.getField();
-            }
-            Sort.Direction sortDirection = Sort.Direction.fromString(order.getDir());
+        for (String sortColumn : input.getOrder_by().keySet()) {
+            Sort.Direction sortDirection = Sort.Direction.fromString(input.getOrder_by().get(sortColumn).name());
             orders.add(new Sort.Order(sortDirection, sortColumn));
         }
         Sort sort = orders.isEmpty() ? Sort.unsorted() : Sort.by(orders);
 
-        if (input.getLength() == -1) {
-            input.setStart(0);
-            input.setLength(Integer.MAX_VALUE);
+        if (input.getLimit() == -1) {
+            input.setOffset(0);
+            input.setLimit(Integer.MAX_VALUE);
         }
-        return new DataTablesPageRequest(input.getStart(), input.getLength(), sort);
+        return new DataTablesPageRequest(input.getOffset(), input.getLimit(), sort);
     }
 
     public abstract T build();
 
     private class DataTablesPageRequest implements Pageable {
         private final int offset;
-        private final int pageSize;
+        private final int limit;
         private final Sort sort;
 
-        DataTablesPageRequest(int offset, int pageSize, Sort sort) {
+        DataTablesPageRequest(int offset, int limit, Sort sort) {
             this.offset = offset;
-            this.pageSize = pageSize;
+            this.limit = limit;
             this.sort = sort;
         }
 
@@ -94,7 +82,7 @@ abstract class AbstractPredicateBuilder<T> {
 
         @Override
         public int getPageSize() {
-            return pageSize;
+            return limit;
         }
 
         @Override

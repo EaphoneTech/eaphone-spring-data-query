@@ -110,7 +110,6 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
     public <R> QueryOutput<R> findAll(QueryInput input, Criteria additionalCrit, Criteria preFilteringCrit,
             Function<T, R> converter) {
         QueryOutput<R> output = new QueryOutput<R>();
-        output.setDraw(input.getDraw());
 
         try {
             long recordsTotal = preFilteringCrit == null ? count() : count(preFilteringCrit);
@@ -157,7 +156,6 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
     public <View> QueryOutput<View> findAll(Class<View> classOfView, QueryInput input,
             AggregationOperation... operations) {
         QueryOutput<View> output = new QueryOutput<View>();
-        output.setDraw(input.getDraw());
 
         try {
             // TODO here count() may not be accurate because Aggregation is not simply a filter

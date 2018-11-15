@@ -1,8 +1,7 @@
 package com.eaphonetech.common.datatables.model.mapping;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.validation.constraints.Min;
@@ -15,20 +14,11 @@ import lombok.Data;
 public class QueryInput {
 
     /**
-     * Draw counter. This is used by DataTables to ensure that the Ajax returns from server-side
-     * processing requests are drawn in sequence by DataTables (Ajax requests are asynchronous and
-     * thus can return out of sequence). This is used as part of the draw return parameter (see
-     * below).
-     */
-    @Min(0)
-    private int draw = 1;
-
-    /**
      * Paging first record indicator. This is the start point in the current data set (0 index based -
      * i.e. 0 is the first record).
      */
     @Min(0)
-    private int start = 0;
+    private int offset = 0;
 
     /**
      * Number of records that the table can display in the current draw. It is expected that the
@@ -37,22 +27,17 @@ public class QueryInput {
      * negates any benefits of server-side processing!)
      */
     @Min(-1)
-    private int length = 10;
-
-    /**
-     * Global search parameter.
-     */
-    private Search search = null;
+    private int limit = 10;
 
     /**
      * Order parameter
      */
-    private List<QueryOrder> orders = new ArrayList<QueryOrder>();
+    private LinkedHashMap<String, QueryOrder> order_by = new LinkedHashMap<>();
 
     /**
      * Per-column search parameter
      */
-    private Map<String, QueryField> filters = new HashMap<>();
+    private Map<String, QueryField> where = new HashMap<>();
 
     /**
      * Find a column by its name
@@ -64,8 +49,8 @@ public class QueryInput {
         if (columnName == null) {
             return null;
         }
-        if (this.filters.containsKey(columnName)) {
-            QueryField qf = this.filters.get(columnName);
+        if (this.where.containsKey(columnName)) {
+            QueryField qf = this.where.get(columnName);
             qf.setField(columnName);
             return qf;
         }
@@ -73,9 +58,9 @@ public class QueryInput {
     }
 
     public void addField(QueryField qf) {
-        if (this.filters == null) {
-            this.filters = new HashMap<>();
+        if (this.where == null) {
+            this.where = new HashMap<>();
         }
-        this.filters.put(qf.getField(), qf);
+        this.where.put(qf.getField(), qf);
     }
 }

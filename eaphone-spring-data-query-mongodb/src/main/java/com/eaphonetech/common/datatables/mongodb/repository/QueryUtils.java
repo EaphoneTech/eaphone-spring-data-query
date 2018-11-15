@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -28,7 +29,6 @@ import org.springframework.util.StringUtils;
 
 import com.eaphonetech.common.datatables.model.mapping.ColumnType;
 import com.eaphonetech.common.datatables.model.mapping.QueryInput;
-import com.eaphonetech.common.datatables.model.mapping.QueryOrder;
 import com.eaphonetech.common.datatables.model.mapping.filter.QueryField;
 import com.eaphonetech.common.datatables.mongodb.model.QueryCount;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -65,13 +65,8 @@ class QueryUtils {
         return q;
     }
 
-    private static List<Object> convertArray(ColumnType type, String value) {
-        final String[] parts = value.split(COMMA);
-        final List<Object> convertedParts = new ArrayList<>(parts.length);
-        for (int i = 0; i < parts.length; i++) {
-            convertedParts.add(type.tryConvert(parts[i]));
-        }
-        return convertedParts;
+    private static List<Object> convertArray(ColumnType type, List<Object> value) {
+        return value.stream().map(o -> type.tryConvert(o)).collect(Collectors.toList());
     }
 
     /**
@@ -177,7 +172,7 @@ class QueryUtils {
             MongoEntityInformation<T, ID> entityInformation) {
         List<Criteria> result = new LinkedList<>();
         // check for each searchable column whether a filter value exists
-        for (final Map.Entry<String, QueryField> entry : input.getFilters().entrySet()) {
+        for (final Map.Entry<String, QueryField> entry : input.getWhere().entrySet()) {
             final QueryField filter = entry.getValue();
             final String fieldName = entry.getKey();
             final ColumnType type = ColumnType.parse(filter.getType());
@@ -185,63 +180,63 @@ class QueryUtils {
             if (filter != null) {
                 boolean hasValidCrit = false;
                 Criteria c = Criteria.where(getFieldName(entityInformation.getJavaType(), fieldName));
-                if (StringUtils.hasLength(filter.getEq())) {
+                if (filter.get_eq() != null) {
                     // $eq takes first place
-                    c.is(type.tryConvert(filter.getEq()));
+                    c.is(type.tryConvert(filter.get_eq()));
                     hasValidCrit = true;
-                } else if (StringUtils.hasLength(filter.getNe())) {
+                } else if (filter.get_ne() != null) {
                     // $ne
-                    c.ne(type.tryConvert(filter.getNe()));
+                    c.ne(type.tryConvert(filter.get_ne()));
                     hasValidCrit = true;
                 } else {
-                    if (StringUtils.hasLength(filter.getIn())) {
+                    if (filter.get_in() != null) {
                         // $in takes second place
-                        c.in(convertArray(type, filter.getIn()));
+                        c.in(convertArray(type, filter.get_in()));
                         hasValidCrit = true;
                     }
 
-                    if (StringUtils.hasLength(filter.getNin())) {
-                        c.nin(convertArray(type, filter.getNin()));
+                    if (filter.get_nin() != null) {
+                        c.nin(convertArray(type, filter.get_nin()));
                         hasValidCrit = true;
                     }
 
-                    if (StringUtils.hasLength(filter.getRegex())) {
+                    if (StringUtils.hasLength(filter.get_regex())) {
                         // $regex also works here
-                        c.regex(filter.getRegex());
+                        c.regex(filter.get_regex());
                         hasValidCrit = true;
                     }
 
-                    if (filter.getIsNull() != null && filter.getIsNull().booleanValue()) {
+                    if (filter.get_null() != null && filter.get_null().booleanValue()) {
                         c.is(null);
                         hasValidCrit = true;
                     }
 
-                    if (filter.getIsEmpty() != null && filter.getIsEmpty().booleanValue()) {
+                    if (filter.get_empty() != null && filter.get_empty().booleanValue()) {
                         c.is("");
                         hasValidCrit = true;
                     }
 
-                    if (filter.getExists() != null) {
-                        c.exists(filter.getExists().booleanValue());
+                    if (filter.get_exists() != null) {
+                        c.exists(filter.get_exists().booleanValue());
                         hasValidCrit = true;
                     }
 
                     if (type.isComparable()) {
                         // $gt, $lt, etc. only works if type is comparable
-                        if (StringUtils.hasLength(filter.getGt())) {
-                            c.gt(type.tryConvert(filter.getGt()));
+                        if (filter.get_gt() != null) {
+                            c.gt(type.tryConvert(filter.get_gt()));
                             hasValidCrit = true;
                         }
-                        if (StringUtils.hasLength(filter.getGte())) {
-                            c.gte(type.tryConvert(filter.getGte()));
+                        if (filter.get_gte() != null) {
+                            c.gte(type.tryConvert(filter.get_gte()));
                             hasValidCrit = true;
                         }
-                        if (StringUtils.hasLength(filter.getLt())) {
-                            c.lt(type.tryConvert(filter.getLt()));
+                        if (filter.get_lt() != null) {
+                            c.lt(type.tryConvert(filter.get_lt()));
                             hasValidCrit = true;
                         }
-                        if (StringUtils.hasLength(filter.getLte())) {
-                            c.lte(type.tryConvert(filter.getLte()));
+                        if (filter.get_lte() != null) {
+                            c.lte(type.tryConvert(filter.get_lte()));
                             hasValidCrit = true;
                         }
                     }
@@ -286,34 +281,18 @@ class QueryUtils {
      */
     static Pageable getPageable(QueryInput input) {
         List<Order> orders = new ArrayList<Order>();
-        for (QueryOrder order : input.getOrders()) {
-            QueryField field = null;
-            if (StringUtils.hasLength(order.getField())) {
-                field = input.getField(order.getField());
-            }
-
-            if (field == null) {
-                if (StringUtils.hasLength(order.getField())) {
-                    // in case if input has no columns defined
-                    Direction sortDirection = Direction.fromString(order.getDir());
-                    orders.add(new Order(sortDirection, order.getField()));
-                } else {
-                    log.debug("Warning: unable to find column by specified order {}", order);
-                }
-            } else {
-                String sortColumn = field.getField();
-                Direction sortDirection = Direction.fromString(order.getDir());
-                orders.add(new Order(sortDirection, sortColumn));
-            }
+        for (String sortColumn : input.getOrder_by().keySet()) {
+            Direction sortDirection = Direction.fromString(input.getOrder_by().get(sortColumn).name());
+            orders.add(new Order(sortDirection, sortColumn));
         }
 
         Sort sort = orders.isEmpty() ? null : Sort.by(orders);
 
-        if (input.getLength() == -1) {
-            input.setStart(0);
-            input.setLength(Integer.MAX_VALUE);
+        if (input.getLimit() == -1) {
+            input.setOffset(0);
+            input.setLimit(Integer.MAX_VALUE);
         }
-        return new DataTablesPageRequest(input.getStart(), input.getLength(), sort);
+        return new DataTablesPageRequest(input.getOffset(), input.getLimit(), sort);
     }
 
     /**
@@ -329,12 +308,12 @@ class QueryUtils {
     private static class DataTablesPageRequest implements Pageable {
 
         private final int offset;
-        private final int pageSize;
+        private final int limit;
         private final Sort sort;
 
-        public DataTablesPageRequest(int offset, int pageSize, Sort sort) {
+        public DataTablesPageRequest(int offset, int limit, Sort sort) {
             this.offset = offset;
-            this.pageSize = pageSize;
+            this.limit = limit;
             this.sort = sort;
         }
 
@@ -345,7 +324,7 @@ class QueryUtils {
 
         @Override
         public int getPageSize() {
-            return pageSize;
+            return limit;
         }
 
         @Override

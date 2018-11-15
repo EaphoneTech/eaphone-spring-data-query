@@ -55,9 +55,6 @@ public class SpecificationBuilder<T> extends AbstractPredicateBuilder<Specificat
                 if (hasColumnFilter) {
                     Filter columnFilter = node.getData();
                     columnPredicates.add(columnFilter.createPredicate(from, criteriaBuilder, node.getName()));
-                } else if (hasGlobalFilter) {
-                    Filter globalFilter = tree.getData();
-                    globalPredicates.add(globalFilter.createPredicate(from, criteriaBuilder, node.getName()));
                 }
             }
             for (Node<Filter> child : node.getChildren()) {
