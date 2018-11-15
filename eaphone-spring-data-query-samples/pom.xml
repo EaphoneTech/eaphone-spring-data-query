@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.eaphonetech</groupId>
 		<artifactId>eaphone-spring-data-query-parent</artifactId>
-		<version>1.0.1-RELEASE</version>
+		<version>1.1.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>eaphone-spring-data-query-samples</artifactId>
@@ -21,27 +21,6 @@
 		<java.version>1.8</java.version>
 		<m2eclipse.wtp.contextRoot>/</m2eclipse.wtp.contextRoot>
 	</properties>
-
-	<dependencyManagement>
-		<dependencies>
-			<!-- fongo 2.1.1 does not support mongo-driver 3.6 -->
-			<dependency>
-				<groupId>org.mongodb</groupId>
-				<artifactId>mongo-java-driver</artifactId>
-				<version>3.5.0</version>
-			</dependency>
-			<dependency>
-				<groupId>org.mongodb</groupId>
-				<artifactId>mongodb-driver</artifactId>
-				<version>3.5.0</version>
-			</dependency>
-			<dependency>
-				<groupId>org.mongodb</groupId>
-				<artifactId>mongodb-driver-core</artifactId>
-				<version>3.5.0</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
@@ -71,11 +50,11 @@
 			<optional>true</optional>
 		</dependency>
 
-		<!-- fongo for fake mongodb -->
+        <!-- mongo-java-server for fake mongodb -->
 		<dependency>
-			<groupId>com.github.fakemongo</groupId>
-			<artifactId>fongo</artifactId>
-			<version>2.1.1</version>
+			<groupId>de.bwaldvogel</groupId>
+			<artifactId>mongo-java-server</artifactId>
+			<version>1.9.7</version>
 		</dependency>
 
 		<!-- h2 for fake mysql -->

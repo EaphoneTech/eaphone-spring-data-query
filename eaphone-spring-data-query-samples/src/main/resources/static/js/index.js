@@ -48,7 +48,8 @@ $(document).ready(function () {
 		value: {
 			where: {
 				amount: {
-					'_in': [5, 7, 9, 11, 13]
+					"type": "integer",
+					'_in': [5, 9, 13]
 				}
 			}
 		}
