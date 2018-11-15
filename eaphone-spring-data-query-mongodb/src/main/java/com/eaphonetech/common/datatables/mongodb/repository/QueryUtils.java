@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -64,13 +65,8 @@ class QueryUtils {
         return q;
     }
 
-    private static List<Object> convertArray(ColumnType type, String value) {
-        final String[] parts = value.split(COMMA);
-        final List<Object> convertedParts = new ArrayList<>(parts.length);
-        for (int i = 0; i < parts.length; i++) {
-            convertedParts.add(type.tryConvert(parts[i]));
-        }
-        return convertedParts;
+    private static List<Object> convertArray(ColumnType type, List<Object> value) {
+        return value.stream().map(o -> type.tryConvert(o)).collect(Collectors.toList());
     }
 
     /**
@@ -184,22 +180,22 @@ class QueryUtils {
             if (filter != null) {
                 boolean hasValidCrit = false;
                 Criteria c = Criteria.where(getFieldName(entityInformation.getJavaType(), fieldName));
-                if (StringUtils.hasLength(filter.get_eq())) {
+                if (filter.get_eq() != null) {
                     // $eq takes first place
                     c.is(type.tryConvert(filter.get_eq()));
                     hasValidCrit = true;
-                } else if (StringUtils.hasLength(filter.get_ne())) {
+                } else if (filter.get_ne() != null) {
                     // $ne
                     c.ne(type.tryConvert(filter.get_ne()));
                     hasValidCrit = true;
                 } else {
-                    if (StringUtils.hasLength(filter.get_in())) {
+                    if (filter.get_in() != null) {
                         // $in takes second place
                         c.in(convertArray(type, filter.get_in()));
                         hasValidCrit = true;
                     }
 
-                    if (StringUtils.hasLength(filter.get_nin())) {
+                    if (filter.get_nin() != null) {
                         c.nin(convertArray(type, filter.get_nin()));
                         hasValidCrit = true;
                     }
@@ -227,19 +223,19 @@ class QueryUtils {
 
                     if (type.isComparable()) {
                         // $gt, $lt, etc. only works if type is comparable
-                        if (StringUtils.hasLength(filter.get_gt())) {
+                        if (filter.get_gt() != null) {
                             c.gt(type.tryConvert(filter.get_gt()));
                             hasValidCrit = true;
                         }
-                        if (StringUtils.hasLength(filter.get_gte())) {
+                        if (filter.get_gte() != null) {
                             c.gte(type.tryConvert(filter.get_gte()));
                             hasValidCrit = true;
                         }
-                        if (StringUtils.hasLength(filter.get_lt())) {
+                        if (filter.get_lt() != null) {
                             c.lt(type.tryConvert(filter.get_lt()));
                             hasValidCrit = true;
                         }
-                        if (StringUtils.hasLength(filter.get_lte())) {
+                        if (filter.get_lte() != null) {
                             c.lte(type.tryConvert(filter.get_lte()));
                             hasValidCrit = true;
                         }

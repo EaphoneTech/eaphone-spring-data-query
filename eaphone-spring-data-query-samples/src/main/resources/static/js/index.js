@@ -33,6 +33,26 @@ $(document).ready(function () {
 			}
 		}
 	}, {
+		summary: 'Enumeration (in)',
+		description: 'Enumeration with string',
+		value: {
+			where: {
+				orderNumber: {
+					'_in': ['O10001', 'O10002']
+				}
+			}
+		}
+	}, {
+		summary: 'Enumeration (in)',
+		description: 'Enumeration with number',
+		value: {
+			where: {
+				amount: {
+					'_in': [5, 7, 9, 11, 13]
+				}
+			}
+		}
+	}, {
 		summary: 'Range filter on one column',
 		description: 'More where on single column',
 		value: {
@@ -148,7 +168,7 @@ $(document).ready(function () {
 	let post = function (data) {
 		let jsonModel = JSON.parse(data);
 		$.ajax({
-			url: '/data/orders',
+			url: '/data/orders/search',
 			type: 'post',
 			data: data,
 			contentType: 'application/json; charset=UTF-8',
