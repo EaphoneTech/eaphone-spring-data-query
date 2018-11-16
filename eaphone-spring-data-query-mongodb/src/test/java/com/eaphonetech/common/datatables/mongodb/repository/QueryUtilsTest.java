@@ -22,7 +22,8 @@ public class QueryUtilsTest {
         testGetLikeFilterPattern("%bcd", ".*bcd$");
         testGetLikeFilterPattern("bcd%", "^bcd.*");
         testGetLikeFilterPattern("%bcd%", ".*bcd.*");
-        testGetLikeFilterPattern(".+", "\\.\\+");
+        testGetLikeFilterPattern(".+", "^\\.\\+$");
+        testGetLikeFilterPattern("9.5%", "^9\\.5.*");
     }
 
 }

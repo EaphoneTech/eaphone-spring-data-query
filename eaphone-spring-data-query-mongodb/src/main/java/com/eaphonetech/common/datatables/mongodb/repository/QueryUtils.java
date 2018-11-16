@@ -299,6 +299,11 @@ class QueryUtils {
             return null;
         }
         String pattern = filterValue;
+        // escape regex symbols
+        for (char t : ".+?*^$()[]".toCharArray()) {
+            pattern = pattern.replaceAll("\\" + t, "\\\\" + t);
+        }
+        // handle start and end
         if (!filterValue.startsWith("%")) {
             pattern = "^" + pattern;
         }
