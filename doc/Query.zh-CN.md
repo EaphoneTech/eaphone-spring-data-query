@@ -15,11 +15,9 @@
     "offset": 0,
     "limit": 10,
     "order_by": [{
-        "field": "field1",
-        "dir": "asc"
+        "field1": "asc"
     }, {
-        "field": "field2",
-        "dir": "desc"
+        "field2": "desc"
     }],
     "where": {
         "field1": {
@@ -77,8 +75,7 @@ POST /search
 
 {
     "order_by": [{
-        "field": "price.value",
-        "dir": "desc"
+        "price.value": "desc"
     }]
 }
 ```
@@ -90,12 +87,10 @@ POST /search
 
 {
     "order_by": [{
-        "field": "price.value",
-        "dir": "asc"
+        "price.value": "asc"
     }, {
-        "field": "createTime",
-        "dir": "desc"
-    }],
+        "createTime": "desc"
+    }]
 }
 ```
 
@@ -192,7 +187,7 @@ POST /search
             "_eq": "有效"
         },
         "createTime": {
-            "type": "date"
+            "type": "date",
             "_gte": "2018-09-18"
         }
     }
