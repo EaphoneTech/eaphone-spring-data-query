@@ -1,7 +1,6 @@
 package com.eaphonetech.common.datatables.jpa.repository;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.function.Function;
 
 import javax.persistence.EntityManager;
@@ -14,6 +13,7 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import com.eaphonetech.common.datatables.jpa.SpecificationBuilder;
 import com.eaphonetech.common.datatables.model.mapping.QueryInput;
 import com.eaphonetech.common.datatables.model.mapping.QueryOutput;
+import com.eaphonetech.common.datatables.util.Converter;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,35 +22,23 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
         implements JpaQueryRepository<T, ID> {
 
     EaphoneQueryRepositoryImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
-
         super(entityInformation, entityManager);
     }
 
     @Override
     public QueryOutput<T> findAll(QueryInput input) {
-        return findAll(input, null, null, null);
+        return findAll(input, null, null);
     }
 
     @Override
     public QueryOutput<T> findAll(QueryInput input, Specification<T> additionalSpecification) {
-        return findAll(input, additionalSpecification, null, null);
+        return findAll(input, additionalSpecification, null);
     }
 
     @Override
     public QueryOutput<T> findAll(QueryInput input, Specification<T> additionalSpecification,
             Specification<T> preFilteringSpecification) {
-        return findAll(input, additionalSpecification, preFilteringSpecification, null);
-    }
-
-    @Override
-    public <R> QueryOutput<R> findAll(QueryInput input, Function<T, R> converter) {
-        return findAll(input, null, null, converter);
-    }
-
-    @Override
-    public <R> QueryOutput<R> findAll(QueryInput input, Specification<T> additionalSpecification,
-            Specification<T> preFilteringSpecification, Function<T, R> converter) {
-        QueryOutput<R> output = new QueryOutput<>();
+        QueryOutput<T> output = new QueryOutput<>();
         if (input.getLimit() == 0) {
             return output;
         }
@@ -66,17 +54,30 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
             Page<T> data = findAll(Specification.where(specificationBuilder.build()).and(additionalSpecification)
                     .and(preFilteringSpecification), specificationBuilder.createPageable());
 
-            @SuppressWarnings("unchecked")
-            List<R> content = converter == null ? (List<R>) data.getContent() : data.map(converter).getContent();
-            output.setData(content);
+            output.setDraw(input.getDraw());
+            output.setData(data.getContent());
             output.setFiltered(data.getTotalElements());
 
         } catch (Exception e) {
-            log.error("exception", e);
+            output.setDraw(input.getDraw());
             output.setError(e.toString());
+            output.setFiltered(0L);
+            log.error("caught exception", e);
         }
 
         return output;
+    }
+
+    @Override
+    public <R> QueryOutput<R> findAll(QueryInput input, Function<T, R> converter) {
+        return findAll(input, null, null, converter);
+    }
+
+    @Override
+    public <R> QueryOutput<R> findAll(QueryInput input, Specification<T> additionalSpecification,
+            Specification<T> preFilteringSpecification, Function<T, R> converter) {
+        QueryOutput<T> raw = findAll(input, additionalSpecification, preFilteringSpecification);
+        return Converter.convert(raw, converter);
     }
 
 }

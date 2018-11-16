@@ -17,7 +17,7 @@ import lombok.Data;
 
 @Data
 public class QueryInput {
-
+    private Integer draw;
     /**
      * Paging first record indicator. This is the start point in the current data set (0 index based -
      * i.e. 0 is the first record).
@@ -48,29 +48,4 @@ public class QueryInput {
      * Per-column search parameter
      */
     private Map<String, QueryField> where = new HashMap<>();
-
-    /**
-     * Find a column by its name
-     *
-     * @param columnName the name of the column
-     * @return the given Column, or <code>null</code> if not found
-     */
-    public QueryField getField(String columnName) {
-        if (columnName == null) {
-            return null;
-        }
-        if (this.where.containsKey(columnName)) {
-            QueryField qf = this.where.get(columnName);
-            qf.setField(columnName);
-            return qf;
-        }
-        return null;
-    }
-
-    public void addField(QueryField qf) {
-        if (this.where == null) {
-            this.where = new HashMap<>();
-        }
-        this.where.put(qf.getField(), qf);
-    }
 }

@@ -25,6 +25,7 @@ import org.springframework.data.mongodb.repository.support.SimpleMongoRepository
 import com.eaphonetech.common.datatables.model.mapping.QueryInput;
 import com.eaphonetech.common.datatables.model.mapping.QueryOutput;
 import com.eaphonetech.common.datatables.mongodb.model.QueryCount;
+import com.eaphonetech.common.datatables.util.Converter;
 
 /**
  * Repository implementation
@@ -43,35 +44,6 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
         super(metadata, mongoOperations);
         this.entityInformation = metadata;
         this.mongoOperations = mongoOperations;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.springframework.data.mongodb.datatables.repository.DataTablesRepository#findAll(org.springframework.data.jpa.
-     * datatables.mapping.QueryInput)
-     */
-    @Override
-    public QueryOutput<T> findAll(QueryInput input) {
-        return findAll(input, null, null, null);
-    }
-
-    @Override
-    public <R> QueryOutput<R> findAll(QueryInput input, Function<T, R> converter) {
-        return findAll(input, null, null, converter);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.springframework.data.mongodb.datatables.repository.DataTablesRepository#findAll(org.springframework.data.jpa.
-     * datatables.mapping.QueryInput, org.springframework.data.mongodb.core.query.Criteria)
-     */
-    @Override
-    public QueryOutput<T> findAll(QueryInput input, Criteria additionalCriteria) {
-        return findAll(input, additionalCriteria, null, null);
     }
 
     private long count(Criteria crit) {
@@ -95,9 +67,71 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
         return new PageImpl<S>(mongoOperations.find(q, classOfS, this.entityInformation.getCollectionName()), p, count);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.springframework.data.mongodb.datatables.repository.DataTablesRepository#findAll(org.springframework.data.jpa.
+     * datatables.mapping.QueryInput)
+     */
+    @Override
+    public QueryOutput<T> findAll(QueryInput input) {
+        return findAll(input, null, null);
+    }
+
+    @Override
+    public <View> QueryOutput<View> findAll(QueryInput input, Function<T, View> converter) {
+        return findAll(input, null, null, converter);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.springframework.data.mongodb.datatables.repository.DataTablesRepository#findAll(org.springframework.data.jpa.
+     * datatables.mapping.QueryInput, org.springframework.data.mongodb.core.query.Criteria)
+     */
+    @Override
+    public QueryOutput<T> findAll(QueryInput input, Criteria additionalCriteria) {
+        return findAll(input, additionalCriteria, null);
+    }
+
     @Override
     public QueryOutput<T> findAll(QueryInput input, Criteria additionalCriteria, Criteria preFilteringCriteria) {
-        return findAll(input, additionalCriteria, preFilteringCriteria, null);
+        QueryOutput<T> output = new QueryOutput<>();
+
+        try {
+            long recordsTotal = preFilteringCriteria == null ? count() : count(preFilteringCriteria);
+            if (recordsTotal == 0) {
+                return output;
+            }
+            output.setTotal(recordsTotal);
+
+            Query query = QueryUtils.getQuery(this.entityInformation, input);
+            if (additionalCriteria != null) {
+                query.addCriteria(additionalCriteria);
+            }
+
+            if (preFilteringCriteria != null) {
+                query.addCriteria(preFilteringCriteria);
+            }
+
+            Pageable pageable = QueryUtils.getPageable(input);
+
+            Page<T> data = findAll(query, pageable, this.entityInformation.getJavaType());
+
+            output.setDraw(input.getDraw());
+            output.setData(data.getContent());
+            output.setFiltered(data.getTotalElements());
+
+        } catch (Exception e) {
+            output.setDraw(input.getDraw());
+            output.setError(e.toString());
+            output.setFiltered(0L);
+            log.error("caught exception", e);
+        }
+
+        return output;
     }
 
     /**
@@ -107,42 +141,11 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
      * @param converter
      * @return
      */
-    public <R> QueryOutput<R> findAll(QueryInput input, Criteria additionalCrit, Criteria preFilteringCrit,
-            Function<T, R> converter) {
-        QueryOutput<R> output = new QueryOutput<R>();
-
-        try {
-            long recordsTotal = preFilteringCrit == null ? count() : count(preFilteringCrit);
-            if (recordsTotal == 0) {
-                return output;
-            }
-            output.setTotal(recordsTotal);
-
-            Query query = QueryUtils.getQuery(this.entityInformation, input);
-            if (additionalCrit != null) {
-                query.addCriteria(additionalCrit);
-            }
-
-            if (preFilteringCrit != null) {
-                query.addCriteria(preFilteringCrit);
-            }
-
-            Pageable pageable = QueryUtils.getPageable(input);
-
-            Page<T> data = findAll(query, pageable, this.entityInformation.getJavaType());
-
-            @SuppressWarnings("unchecked")
-            List<R> content = converter == null ? (List<R>) data.getContent() : data.map(converter).getContent();
-            output.setData(content);
-            output.setFiltered(data.getTotalElements());
-
-        } catch (Exception e) {
-            output.setError(e.toString());
-            output.setFiltered(0L);
-            log.error("caught exception", e);
-        }
-
-        return output;
+    @Override
+    public <View> QueryOutput<View> findAll(QueryInput input, Criteria additionalCrit, Criteria preFilteringCrit,
+            Function<T, View> converter) {
+        QueryOutput<T> raw = findAll(input, additionalCrit, preFilteringCrit);
+        return Converter.convert(raw, converter);
     }
 
     /*

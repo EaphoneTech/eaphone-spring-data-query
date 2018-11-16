@@ -24,5 +24,5 @@ public interface EaphoneQueryRepository<T, ID extends Serializable> extends Pagi
      * @param converter the {@link Function} to apply to the results of the query
      * @return a {@link QueryOutput}
      */
-    <R> QueryOutput<R> findAll(QueryInput input, Function<T, R> converter);
+    <View> QueryOutput<View> findAll(QueryInput input, Function<T, View> converter);
 }

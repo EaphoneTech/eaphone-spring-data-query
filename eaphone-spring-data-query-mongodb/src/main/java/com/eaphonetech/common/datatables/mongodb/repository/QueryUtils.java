@@ -246,29 +246,6 @@ class QueryUtils {
             }
         }
 
-        // check whether a global filter value exists
-        // TODO <pre>due to limitations of the BasicDBObject, you can't add a second "$or" expression</pre>
-        // this conflicts with additionalCriteria and preFilteringCriteria
-        /*
-         * String globalFilterValue = input.getSearch().getValue();
-         * if (StringUtils.hasText(globalFilterValue)) {
-         * 
-         * Criteria crit = new Criteria();
-         * 
-         * // add a 'WHERE .. LIKE' clause on each searchable column
-         * for (ColumnParameter column : input.getColumns()) {
-         * if (column.getSearchable()) {
-         * 
-         * Criteria c = Criteria.where(column.getData());
-         * c.regex(getLikeFilterPattern(globalFilterValue));
-         * 
-         * crit.orOperator(c);
-         * }
-         * }
-         * q.addCriteria(crit);
-         * }
-         */
-
         return result;
     }
 
