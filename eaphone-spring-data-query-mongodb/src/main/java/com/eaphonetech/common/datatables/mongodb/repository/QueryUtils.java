@@ -4,7 +4,6 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,6 @@ import javax.annotation.Nullable;
 import org.reflections.ReflectionUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
@@ -38,9 +36,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 class QueryUtils {
-
-    private static final String COMMA = ",";
-
     /**
      * check jackson at startup
      */
@@ -204,6 +199,10 @@ class QueryUtils {
                         // $regex also works here
                         c.regex(filter.get_regex());
                         hasValidCrit = true;
+                    } else if (StringUtils.hasLength(filter.get_like())) {
+                        // like is converted to $regex
+                        c.regex(getLikeFilterPattern(filter.get_like()));
+                        hasValidCrit = true;
                     }
 
                     if (filter.get_null() != null && filter.get_null().booleanValue()) {
@@ -280,16 +279,10 @@ class QueryUtils {
      * @return a {@link Pageable}, must not be {@literal null}.
      */
     static Pageable getPageable(QueryInput input) {
-        List<Order> orders = new ArrayList<Order>();
-        for (String sortColumn : input.getOrder_by().keySet()) {
-            Direction sortDirection = Direction.fromString(input.getOrder_by().get(sortColumn).name());
-            orders.add(new Order(sortDirection, sortColumn));
-        }
-
-        Sort sort = orders.isEmpty() ? null : Sort.by(orders);
+        List<Order> orders = input.getOrders();
+        Sort sort = orders.isEmpty() ? Sort.unsorted() : Sort.by(orders);
 
         if (input.getLimit() == -1) {
-            input.setOffset(0);
             input.setLimit(Integer.MAX_VALUE);
         }
         return new DataTablesPageRequest(input.getOffset(), input.getLimit(), sort);
@@ -301,8 +294,19 @@ class QueryUtils {
      * @param filterValue
      * @return
      */
-    private static Pattern getLikeFilterPattern(String filterValue) {
-        return Pattern.compile(filterValue, Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
+    static Pattern getLikeFilterPattern(String filterValue) {
+        if (filterValue == null) {
+            return null;
+        }
+        String pattern = filterValue;
+        if (!filterValue.startsWith("%")) {
+            pattern = "^" + pattern;
+        }
+        if (!filterValue.endsWith("%")) {
+            pattern = pattern + "$";
+        }
+        pattern = pattern.replaceAll("%", ".*");
+        return Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
     }
 
     private static class DataTablesPageRequest implements Pageable {

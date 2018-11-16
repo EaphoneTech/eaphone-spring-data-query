@@ -1,5 +1,8 @@
 $(document).ready(function () {
-	/** $grid is the table body containing rendered <tr>s */
+	/**
+	 * $grid is the table body containing rendered
+	 * <tr>s
+	 */
 	let $grid = $('#table-body');
 	/** $postInput contains data (string) to post */
 	let $postInput = $('#input-post-data');
@@ -98,9 +101,20 @@ $(document).ready(function () {
 		summary: 'Orders',
 		description: 'Multiple orders',
 		value: {
-			order_by: {
-				'amount': 'desc',
+			order_by: [{
+				'amount': 'desc'
+			}, {
 				'price': 'asc'
+			}]
+		}
+	}, {
+		summary: 'Like',
+		description: 'SQL like',
+		value: {
+			where: {
+				"orderNumber": {
+					"_like": "O100%"
+				}
 			}
 		}
 	}];
@@ -127,7 +141,9 @@ $(document).ready(function () {
 
 	/**
 	 * display response into grid
-	 * @param {object} data server response 
+	 * 
+	 * @param {object}
+	 *            data server response
 	 */
 	let display = function (data) {
 		// generate table rows
@@ -157,14 +173,16 @@ $(document).ready(function () {
 				.appendTo($pagination);
 		}
 
-		// display server output 
+		// display server output
 		$output.text(JSON.stringify(data, null, 2));
 		hljs.highlightBlock($output[0]);
 	};
 
 	/**
 	 * POST to server
-	 * @param {string} data request body
+	 * 
+	 * @param {string}
+	 *            data request body
 	 */
 	let post = function (data) {
 		let jsonModel = JSON.parse(data);

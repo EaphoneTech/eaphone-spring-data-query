@@ -1,10 +1,15 @@
 package com.eaphonetech.common.datatables.model.mapping;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.validation.constraints.Min;
+
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Sort;
 
 import com.eaphonetech.common.datatables.model.mapping.filter.QueryField;
 
@@ -32,7 +37,12 @@ public class QueryInput {
     /**
      * Order parameter
      */
-    private LinkedHashMap<String, QueryOrder> order_by = new LinkedHashMap<>();
+    private List<QueryOrder> order_by = new ArrayList<QueryOrder>();
+
+    @Transient
+    public List<Sort.Order> getOrders() {
+        return this.order_by.stream().flatMap(entry -> entry.get()).collect(Collectors.toList());
+    }
 
     /**
      * Per-column search parameter

@@ -1,6 +1,5 @@
 package com.eaphonetech.common.datatables.jpa;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -48,15 +47,10 @@ abstract class AbstractPredicateBuilder<T> {
      * @return a {@link Pageable}, must not be {@literal null}.
      */
     public Pageable createPageable() {
-        List<Sort.Order> orders = new ArrayList<>();
-        for (String sortColumn : input.getOrder_by().keySet()) {
-            Sort.Direction sortDirection = Sort.Direction.fromString(input.getOrder_by().get(sortColumn).name());
-            orders.add(new Sort.Order(sortDirection, sortColumn));
-        }
+        List<Sort.Order> orders = input.getOrders();
         Sort sort = orders.isEmpty() ? Sort.unsorted() : Sort.by(orders);
 
         if (input.getLimit() == -1) {
-            input.setOffset(0);
             input.setLimit(Integer.MAX_VALUE);
         }
         return new DataTablesPageRequest(input.getOffset(), input.getLimit(), sort);
