@@ -7,38 +7,33 @@ I use DataTables in some projects and wrote SpringMVC server side for it. Later 
 
 ## Query ##
 
-Two query methods are designed as follows:
-
-1. Using HTTP GET , as `?firstname=Dave&lastname=Matthews` (NOTE: Not Implemented Yet);
-2. Using HTTP POST, as `@RequestBody`:
+HTTP POST as `@RequestBody` is recommended:
 
 ```json
 {
     "draw": 1,
-    "start": 0,
-    "length": 10,
-    "orders": [{
-        "field": "field1",
-        "dir": "asc"
+    "offset": 0,
+    "limit": 10,
+    "order_by": [{
+        "field1": "asc"
     }, {
-        "field": "field2",
-        "dir": "desc"
+        "field2": "desc"
     }],
-    "filters": {
+    "where": {
         "field1": {
-            "gt": "",
-            "gte": "",
-            "lt": "",
-            "lte": "",
-            "eq": "",
-            "ne": "",
-            "in": [],
-            "nin": [],
-            "regex": "",
-            "like": "",
-            "exists": true,
-            "isNull": true,
-            "isEmpty": true
+            "_gt": "",
+            "_gte": "",
+            "_lt": "",
+            "_lte": "",
+            "_eq": "",
+            "_ne": "",
+            "_in": [],
+            "_nin": [],
+            "_regex": "",
+            "_like": "",
+            "_exists": true,
+            "_isNull": true,
+            "_isEmpty": true
         }
     }
 }
@@ -46,15 +41,9 @@ Two query methods are designed as follows:
 
 ## Examples ##
 
-In order to increase readability, all query strings in following HTTP GET examples are not escaped. (And they are NOT supported yet).
-
 ### Basic Query ###
 
-None of the `draw`, `start`, `length`, `orders`, `filters` are required, so the basic query is:
-
-```http
-GET /
-```
+None of the `draw`, `offset`, `limit`, `order_by`, `where` are required, so the basic query is:
 
 ```http
 POST /search
@@ -66,18 +55,14 @@ e.g. NO parameters are needed.
 
 ### Pagination ###
 
-Paging is controlled by `start` and `length`, which is the same as `SKIP` and `LIMIT`. 
-
-```http
-GET /?start=30&length=10
-```
+Paging is controlled by `offset` and `limit`, which keeps the same as `SKIP` and `LIMIT` in SQL. 
 
 ```http
 POST /search
 
 {
-    "start": 30,
-    "length": 10
+    "offset": 30,
+    "limit": 10
 }
 ```
 
@@ -86,14 +71,10 @@ POST /search
 Ordering by one column:
 
 ```http
-GET /?$order=price.value,desc
-```
-
-```http
 POST /search
 
 {
-    "orders": [{
+    "order_by": [{
         "field": "price.value",
         "dir": "desc"
     }]
@@ -103,76 +84,58 @@ POST /search
 Ordering by more columns: 
 
 ```http
-GET /?$order=price.value,desc&$order=createTime,desc
-```
-
-```http
 POST /search
 
 {
-    "orders": [{
-        "field": "price.value",
-        "dir": "asc"
+    "order_by": [{
+        "price.value": "asc"
     }, {
-        "field": "createTime",
-        "dir": "desc"
-    }],
-}
-```
-
-### Accurate Search ###
-
-```http
-GET /?user.name=JamesBond
-```
-
-```http
-POST /search
-
-{
-    "filters": {
-        "user.name": {
-            "eq": "JamesBond"
-        }
-    }
+        "createTime": "desc"
+    }]
 }
 ```
 
 ### Filtering ###
 
-* Like (`LIKE %value%`)
-
-```http
-GET /?user.name.$like=JamesBond
-```
+* Search by equality
 
 ```http
 POST /search
 
 {
-    "filters": {
+    "where": {
         "user.name": {
-            "like": "JamesBond"
+            "_eq": "James Bond"
         }
     }
 }
 ```
 
-* Numerical Range
-
-```http
-GET /?price.value.type=double&price.value.$gte=9.0&price.value.$lt=9.5
-```
+* Like (`LIKE %value%`)
 
 ```http
 POST /search
 
 {
-    "filters": {
+    "where": {
+        "user.name": {
+            "_like": "James%"
+        }
+    }
+}
+```
+
+* By Numerical Range
+
+```http
+POST /search
+
+{
+    "where": {
         "price.value": {
             "type": "double",
-            "gte": 9.0,
-            "lt": 9.5
+            "_gte": 9.0,
+            "_lt": 9.5
         }
     }
 }
@@ -181,18 +144,14 @@ POST /search
 * Date Range & Time Range
 
 ```http
-GET /?createTime.type=date&createTime.$lt=2017-09-20&createTime.$gt=2017-09-19
-```
-
-```http
 POST /search
 
 {
-    "filters": {
+    "where": {
         "createTime": {
             "type": "date",
-            "lt": "2017-09-20",
-            "gt": "2017-09-19"
+            "_lt": "2017-09-20",
+            "_gt": "2017-09-19"
         }
     }
 }
@@ -201,16 +160,12 @@ POST /search
 * In
 
 ```http
-GET /?status.$in=Deleted,Invalid
-```
-
-```http
 POST /search
 
 {
-    "filters": {
+    "where": {
         "status": {
-            "in": ["Deleted", "Invalid"]
+            "_in": ["Deleted", "Invalid"]
         }
     }
 }
@@ -221,23 +176,19 @@ POST /search
 Multiple filters are joined by `AND` logic.
 
 ```http
-GET /?name.$like=JamesBond&status=Valid&createTime.$type=date&createTime.$gte=2018-09-18
-```
-
-```http
 POST /search
 
 {
-    "filters": {
+    "where": {
         "name": {
-            "like": "JamesBond"
+            "_like": "James"
         },
         "status": {
-            "eq": "Valid"
+            "_eq": "Valid"
         },
         "createTime": {
-            "type": "date"
-            "gte": "2018-09-18"
+            "type": "date",
+            "_gte": "2018-09-18"
         }
     }
 }

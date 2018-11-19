@@ -1,5 +1,8 @@
 $(document).ready(function () {
-	/** $grid is the table body containing rendered <tr>s */
+	/**
+	 * $grid is the table body containing rendered
+	 * <tr>s
+	 */
 	let $grid = $('#table-body');
 	/** $postInput contains data (string) to post */
 	let $postInput = $('#input-post-data');
@@ -29,6 +32,27 @@ $(document).ready(function () {
 				price: {
 					'type': 'double',
 					'_lt': 20.5
+				}
+			}
+		}
+	}, {
+		summary: 'Enumeration (in)',
+		description: 'Enumeration with string',
+		value: {
+			where: {
+				orderNumber: {
+					'_in': ['O10001', 'O10002']
+				}
+			}
+		}
+	}, {
+		summary: 'Enumeration (in)',
+		description: 'Enumeration with number',
+		value: {
+			where: {
+				amount: {
+					"type": "integer",
+					'_in': [5, 9, 13]
 				}
 			}
 		}
@@ -77,9 +101,20 @@ $(document).ready(function () {
 		summary: 'Orders',
 		description: 'Multiple orders',
 		value: {
-			order_by: {
-				'amount': 'desc',
+			order_by: [{
+				'amount': 'desc'
+			}, {
 				'price': 'asc'
+			}]
+		}
+	}, {
+		summary: 'Like',
+		description: 'SQL like',
+		value: {
+			where: {
+				"orderNumber": {
+					"_like": "O100%"
+				}
 			}
 		}
 	}];
@@ -106,7 +141,9 @@ $(document).ready(function () {
 
 	/**
 	 * display response into grid
-	 * @param {object} data server response 
+	 * 
+	 * @param {object}
+	 *            data server response
 	 */
 	let display = function (data) {
 		// generate table rows
@@ -136,19 +173,21 @@ $(document).ready(function () {
 				.appendTo($pagination);
 		}
 
-		// display server output 
+		// display server output
 		$output.text(JSON.stringify(data, null, 2));
 		hljs.highlightBlock($output[0]);
 	};
 
 	/**
 	 * POST to server
-	 * @param {string} data request body
+	 * 
+	 * @param {string}
+	 *            data request body
 	 */
 	let post = function (data) {
 		let jsonModel = JSON.parse(data);
 		$.ajax({
-			url: '/data/orders',
+			url: '/data/orders/search',
 			type: 'post',
 			data: data,
 			contentType: 'application/json; charset=UTF-8',

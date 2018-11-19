@@ -2,6 +2,7 @@ package com.eaphonetech.common.datatables.mongodb.repository;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.function.Function;
 
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
@@ -38,6 +39,16 @@ public interface MongoDBQueryRepository<T, ID extends Serializable> extends Eaph
     QueryOutput<T> findAll(QueryInput input, Criteria additionalCriteria, Criteria preFilteringCriteria);
 
     /**
+     * Find with type conversion
+     * @param input
+     * @param additionalCrit
+     * @param preFilteringCrit
+     * @param converter
+     * @return
+     */
+    <View> QueryOutput<View> findAll(QueryInput input, Criteria additionalCrit, Criteria preFilteringCrit,
+            Function<T, View> converter);
+    /**
      * Returns the filtered list for the given {@link QueryInput} using the given {@link TypedAggregation}
      * 
      * @param classOfView
@@ -45,8 +56,7 @@ public interface MongoDBQueryRepository<T, ID extends Serializable> extends Eaph
      * @param operations
      * @return
      */
-    <View> QueryOutput<View> findAll(Class<View> classOfView, QueryInput input,
-            AggregationOperation... operations);
+    <View> QueryOutput<View> findAll(Class<View> classOfView, QueryInput input, AggregationOperation... operations);
 
     /**
      * Returns the filtered list for the given {@link QueryInput} using the given {@link TypedAggregation}

@@ -8,8 +8,11 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import com.eaphonetech.common.datatables.mongodb.repository.EaphoneQueryRepositoryFactoryBean;
-import com.github.fakemongo.Fongo;
 import com.mongodb.MongoClient;
+import com.mongodb.ServerAddress;
+
+import de.bwaldvogel.mongo.MongoServer;
+import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
 
 @SpringBootApplication
 @EnableMongoRepositories(repositoryFactoryBeanClass = EaphoneQueryRepositoryFactoryBean.class)
@@ -18,13 +21,15 @@ public class MongodbSampleApplication {
     @Configuration
     static class Config {
         @Bean
-        Fongo fongo() {
-            return new Fongo("InMemoryMongo");
+        MongoServer mongoServer() {
+            MongoServer server = new MongoServer(new MemoryBackend());
+            server.bind();
+            return server;
         }
 
         @Bean
-        MongoClient mongoClient(Fongo fongo) {
-            return fongo.getMongo();
+        MongoClient mongoClient(MongoServer server) {
+            return new MongoClient(new ServerAddress(server.getLocalAddress()));
         }
 
         @Bean

@@ -22,7 +22,7 @@ A short but working [example](eaphone-spring-data-query-samples).
 <dependency>
     <groupId>com.eaphonetech</groupId>
     <artifactId>eaphone-spring-data-query-jpa</artifactId>
-    <version>0.4.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -32,7 +32,7 @@ OR for MongoDB:
 <dependency>
     <groupId>com.eaphonetech</groupId>
     <artifactId>eaphone-spring-data-query-mongodb</artifactId>
-    <version>0.4.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
 </dependency>
 ```
 

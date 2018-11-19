@@ -1,16 +1,11 @@
 package com.eaphonetech.common.datatables.samples.mongo.controller;
 
-import java.util.Date;
-
 import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.eaphonetech.common.datatables.model.mapping.QueryInput;
@@ -34,30 +29,7 @@ public class OrderRestController {
     private OrderRepository repo;
 
     @JsonView(QueryOutput.View.class)
-    @GetMapping("/data/orders")
-    public QueryOutput<Order> getOrders(@Valid QueryInput input, @RequestParam(required = false) Date startDate,
-            @RequestParam(required = false) Date endDate) {
-        boolean preFiltering = false;
-        Criteria crit = Criteria.where("date");
-
-        if (startDate != null) {
-            preFiltering = true;
-            crit.gte(startDate);
-        }
-        if (endDate != null) {
-            preFiltering = true;
-            crit.lt(endDate);
-        }
-
-        if (preFiltering) {
-            return repo.findAll(input, crit);
-        } else {
-            return repo.findAll(input);
-        }
-    }
-
-    @JsonView(QueryOutput.View.class)
-    @PostMapping("/data/orders")
+    @PostMapping("/data/orders/search")
     public QueryOutput<Order> getOrdersByPost(@Valid @RequestBody QueryInput input) {
         return repo.findAll(input);
     }

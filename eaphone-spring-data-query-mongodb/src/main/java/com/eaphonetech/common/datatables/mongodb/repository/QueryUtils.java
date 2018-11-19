@@ -4,20 +4,19 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
 import org.reflections.ReflectionUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
@@ -37,9 +36,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 class QueryUtils {
-
-    private static final String COMMA = ",";
-
     /**
      * check jackson at startup
      */
@@ -64,13 +60,8 @@ class QueryUtils {
         return q;
     }
 
-    private static List<Object> convertArray(ColumnType type, String value) {
-        final String[] parts = value.split(COMMA);
-        final List<Object> convertedParts = new ArrayList<>(parts.length);
-        for (int i = 0; i < parts.length; i++) {
-            convertedParts.add(type.tryConvert(parts[i]));
-        }
-        return convertedParts;
+    private static List<Object> convertArray(ColumnType type, List<Object> value) {
+        return value.stream().map(o -> type.tryConvert(o)).collect(Collectors.toList());
     }
 
     /**
@@ -184,22 +175,22 @@ class QueryUtils {
             if (filter != null) {
                 boolean hasValidCrit = false;
                 Criteria c = Criteria.where(getFieldName(entityInformation.getJavaType(), fieldName));
-                if (StringUtils.hasLength(filter.get_eq())) {
+                if (filter.get_eq() != null) {
                     // $eq takes first place
                     c.is(type.tryConvert(filter.get_eq()));
                     hasValidCrit = true;
-                } else if (StringUtils.hasLength(filter.get_ne())) {
+                } else if (filter.get_ne() != null) {
                     // $ne
                     c.ne(type.tryConvert(filter.get_ne()));
                     hasValidCrit = true;
                 } else {
-                    if (StringUtils.hasLength(filter.get_in())) {
+                    if (filter.get_in() != null) {
                         // $in takes second place
                         c.in(convertArray(type, filter.get_in()));
                         hasValidCrit = true;
                     }
 
-                    if (StringUtils.hasLength(filter.get_nin())) {
+                    if (filter.get_nin() != null) {
                         c.nin(convertArray(type, filter.get_nin()));
                         hasValidCrit = true;
                     }
@@ -207,6 +198,10 @@ class QueryUtils {
                     if (StringUtils.hasLength(filter.get_regex())) {
                         // $regex also works here
                         c.regex(filter.get_regex());
+                        hasValidCrit = true;
+                    } else if (StringUtils.hasLength(filter.get_like())) {
+                        // like is converted to $regex
+                        c.regex(getLikeFilterPattern(filter.get_like()));
                         hasValidCrit = true;
                     }
 
@@ -227,19 +222,19 @@ class QueryUtils {
 
                     if (type.isComparable()) {
                         // $gt, $lt, etc. only works if type is comparable
-                        if (StringUtils.hasLength(filter.get_gt())) {
+                        if (filter.get_gt() != null) {
                             c.gt(type.tryConvert(filter.get_gt()));
                             hasValidCrit = true;
                         }
-                        if (StringUtils.hasLength(filter.get_gte())) {
+                        if (filter.get_gte() != null) {
                             c.gte(type.tryConvert(filter.get_gte()));
                             hasValidCrit = true;
                         }
-                        if (StringUtils.hasLength(filter.get_lt())) {
+                        if (filter.get_lt() != null) {
                             c.lt(type.tryConvert(filter.get_lt()));
                             hasValidCrit = true;
                         }
-                        if (StringUtils.hasLength(filter.get_lte())) {
+                        if (filter.get_lte() != null) {
                             c.lte(type.tryConvert(filter.get_lte()));
                             hasValidCrit = true;
                         }
@@ -251,29 +246,6 @@ class QueryUtils {
             }
         }
 
-        // check whether a global filter value exists
-        // TODO <pre>due to limitations of the BasicDBObject, you can't add a second "$or" expression</pre>
-        // this conflicts with additionalCriteria and preFilteringCriteria
-        /*
-         * String globalFilterValue = input.getSearch().getValue();
-         * if (StringUtils.hasText(globalFilterValue)) {
-         * 
-         * Criteria crit = new Criteria();
-         * 
-         * // add a 'WHERE .. LIKE' clause on each searchable column
-         * for (ColumnParameter column : input.getColumns()) {
-         * if (column.getSearchable()) {
-         * 
-         * Criteria c = Criteria.where(column.getData());
-         * c.regex(getLikeFilterPattern(globalFilterValue));
-         * 
-         * crit.orOperator(c);
-         * }
-         * }
-         * q.addCriteria(crit);
-         * }
-         */
-
         return result;
     }
 
@@ -284,16 +256,10 @@ class QueryUtils {
      * @return a {@link Pageable}, must not be {@literal null}.
      */
     static Pageable getPageable(QueryInput input) {
-        List<Order> orders = new ArrayList<Order>();
-        for (String sortColumn : input.getOrder_by().keySet()) {
-            Direction sortDirection = Direction.fromString(input.getOrder_by().get(sortColumn).name());
-            orders.add(new Order(sortDirection, sortColumn));
-        }
-
-        Sort sort = orders.isEmpty() ? null : Sort.by(orders);
+        List<Order> orders = input.getOrders();
+        Sort sort = orders.isEmpty() ? Sort.unsorted() : Sort.by(orders);
 
         if (input.getLimit() == -1) {
-            input.setOffset(0);
             input.setLimit(Integer.MAX_VALUE);
         }
         return new DataTablesPageRequest(input.getOffset(), input.getLimit(), sort);
@@ -305,8 +271,24 @@ class QueryUtils {
      * @param filterValue
      * @return
      */
-    private static Pattern getLikeFilterPattern(String filterValue) {
-        return Pattern.compile(filterValue, Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
+    static Pattern getLikeFilterPattern(String filterValue) {
+        if (filterValue == null) {
+            return null;
+        }
+        String pattern = filterValue;
+        // escape regex symbols
+        for (char t : ".+?*^$()[]".toCharArray()) {
+            pattern = pattern.replaceAll("\\" + t, "\\\\" + t);
+        }
+        // handle start and end
+        if (!filterValue.startsWith("%")) {
+            pattern = "^" + pattern;
+        }
+        if (!filterValue.endsWith("%")) {
+            pattern = pattern + "$";
+        }
+        pattern = pattern.replaceAll("%", ".*");
+        return Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
     }
 
     private static class DataTablesPageRequest implements Pageable {
