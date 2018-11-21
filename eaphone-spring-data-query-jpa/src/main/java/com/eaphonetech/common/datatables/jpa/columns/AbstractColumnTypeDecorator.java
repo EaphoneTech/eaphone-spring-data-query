@@ -137,7 +137,8 @@ public abstract class AbstractColumnTypeDecorator {
                 , 1));
             }
             if (StringUtils.hasLength(filter.get_like())) {
-                predicates.add(crit.like(exp, "%" + filter.get_like() + "%"));
+                // TODO Need test here about whether '%' should be added
+                predicates.add(crit.like(exp, filter.get_like()));
             }
             if (filter.get_empty() != null) {
                 // TODO Need test here about type cast
