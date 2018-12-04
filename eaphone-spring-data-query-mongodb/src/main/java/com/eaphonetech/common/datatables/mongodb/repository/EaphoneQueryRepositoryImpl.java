@@ -199,13 +199,11 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
             QueryInput input, AggregationOperation... operations) {
         final Pageable pageable = QueryUtils.getPageable(input);
 
-        final TypedAggregation<View> aggWithPage = QueryUtils.makeAggregation(classOfView, input, pageable, operations);
+        final TypedAggregation<T> aggWithPage = QueryUtils.makeAggregation(entityInformation.getJavaType(), input, pageable, operations);
 
-        final TypedAggregation<QueryCount> aggCount = QueryUtils.makeAggregationCountOnly(entityInformation, input,
-                operations);
+        final TypedAggregation<T> aggCount = QueryUtils.makeAggregationCountOnly(entityInformation, input, operations);
         long count = 0L;
-        AggregationResults<QueryCount> countResult = mongoOperations.aggregate(aggCount,
-                entityInformation.getJavaType(), QueryCount.class);
+        AggregationResults<QueryCount> countResult = mongoOperations.aggregate(aggCount, QueryCount.class);
 
         if (countResult != null) {
             count = countResult.getUniqueMappedResult().getCount();
@@ -216,8 +214,7 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
         }
 
         List<View> result = null;
-        AggregationResults<View> aggResult = mongoOperations.aggregate(aggWithPage, entityInformation.getJavaType(),
-                classOfView);
+        AggregationResults<View> aggResult = mongoOperations.aggregate(aggWithPage, classOfView);
         if (aggResult != null) {
             result = aggResult.getMappedResults();
         }
