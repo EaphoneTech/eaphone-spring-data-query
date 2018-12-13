@@ -27,7 +27,7 @@ import org.springframework.util.StringUtils;
 
 import com.eaphonetech.common.datatables.model.mapping.ColumnType;
 import com.eaphonetech.common.datatables.model.mapping.QueryInput;
-import com.eaphonetech.common.datatables.model.mapping.filter.QueryField;
+import com.eaphonetech.common.datatables.model.mapping.filter.QueryFilter;
 import com.eaphonetech.common.datatables.mongodb.model.QueryCount;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Predicate;
@@ -167,10 +167,10 @@ class QueryUtils {
             MongoEntityInformation<T, ID> entityInformation) {
         List<Criteria> result = new LinkedList<>();
         // check for each searchable column whether a filter value exists
-        for (final Map.Entry<String, QueryField> entry : input.getWhere().entrySet()) {
-            final QueryField filter = entry.getValue();
+        for (final Map.Entry<String, QueryFilter> entry : input.getWhere().entrySet()) {
+            final QueryFilter filter = entry.getValue();
             final String fieldName = entry.getKey();
-            final ColumnType type = ColumnType.parse(filter.getType());
+            final ColumnType type = ColumnType.parse(entityInformation.getJavaType(), fieldName);
             // handle column.filter
             if (filter != null) {
                 boolean hasValidCrit = false;
