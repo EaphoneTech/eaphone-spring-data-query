@@ -41,18 +41,18 @@ public abstract class AbstractColumnTypeDecorator {
 		}
 		Field field = ReflectionUtils.findField(clazz, attributeName);
 		// TODO 嵌套关联的支持
-		if (field.getType().isAssignableFrom(String.class) || field.getType().isAssignableFrom(char.class)) {
+		if (String.class.isAssignableFrom(field.getType()) || Character.class.isAssignableFrom(field.getType())
+				|| Character.TYPE.equals(field.getType())) {
 			return STRING;
-		} else if (field.getType().isAssignableFrom(Integer.class) || field.getType().isAssignableFrom(Long.class)
-				|| field.getType().isAssignableFrom(byte.class) || field.getType().isAssignableFrom(short.class)
-				|| field.getType().isAssignableFrom(int.class) || field.getType().isAssignableFrom(long.class)) {
+		} else if (Number.class.isAssignableFrom(field.getType()) || Byte.TYPE.equals(field.getType())
+				|| Short.TYPE.equals(field.getType()) || Integer.TYPE.equals(field.getType())
+				|| Long.TYPE.equals(field.getType())) {
 			return INTEGER;
-		} else if (field.getType().isAssignableFrom(float.class) || field.getType().isAssignableFrom(double.class)
-				|| field.getType().isAssignableFrom(Float.class) || field.getType().isAssignableFrom(Double.class)) {
+		} else if (Float.TYPE.equals(field.getType()) || Double.TYPE.equals(field.getType())) {
 			return DOUBLE;
-		} else if (field.getType().isAssignableFrom(boolean.class) || field.getType().isAssignableFrom(Boolean.class)) {
+		} else if (Boolean.TYPE.isAssignableFrom(field.getType())) {
 			return BOOLEAN;
-		} else if (field.getType().isAssignableFrom(Date.class)) {
+		} else if (Date.class.isAssignableFrom(field.getType())) {
 			return DATE;
 		}
 		return STRING;
