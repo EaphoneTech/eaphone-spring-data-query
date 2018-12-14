@@ -41,13 +41,16 @@ public abstract class AbstractColumnTypeDecorator {
 		}
 		Field field = ReflectionUtils.findField(clazz, attributeName);
 		// TODO 嵌套关联的支持
-		if (field.getType().isAssignableFrom(String.class)) {
+		if (field.getType().isAssignableFrom(String.class) || field.getType().isAssignableFrom(char.class)) {
 			return STRING;
-		} else if (field.getType().isAssignableFrom(Integer.class) || field.getType().isAssignableFrom(Long.class)) {
+		} else if (field.getType().isAssignableFrom(Integer.class) || field.getType().isAssignableFrom(Long.class)
+				|| field.getType().isAssignableFrom(byte.class) || field.getType().isAssignableFrom(short.class)
+				|| field.getType().isAssignableFrom(int.class) || field.getType().isAssignableFrom(long.class)) {
 			return INTEGER;
-		} else if (field.getType().isAssignableFrom(Float.class) || field.getType().isAssignableFrom(Double.class)) {
+		} else if (field.getType().isAssignableFrom(float.class) || field.getType().isAssignableFrom(double.class)
+				|| field.getType().isAssignableFrom(Float.class) || field.getType().isAssignableFrom(Double.class)) {
 			return DOUBLE;
-		} else if (field.getType().isAssignableFrom(Boolean.class)) {
+		} else if (field.getType().isAssignableFrom(boolean.class) || field.getType().isAssignableFrom(Boolean.class)) {
 			return BOOLEAN;
 		} else if (field.getType().isAssignableFrom(Date.class)) {
 			return DATE;

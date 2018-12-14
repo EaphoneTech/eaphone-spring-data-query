@@ -30,7 +30,6 @@ $(document).ready(function () {
 		value: {
 			where: {
 				price: {
-					'type': 'double',
 					'_lt': 20.5
 				}
 			}
@@ -51,7 +50,6 @@ $(document).ready(function () {
 		value: {
 			where: {
 				amount: {
-					"type": "integer",
 					'_in': [5, 9, 13]
 				}
 			}
@@ -62,7 +60,6 @@ $(document).ready(function () {
 		value: {
 			where: {
 				price: {
-					'type': 'double',
 					'_gte': 10,
 					'_lt': 20.5
 				}
@@ -74,11 +71,9 @@ $(document).ready(function () {
 		value: {
 			where: {
 				date: {
-					'type': 'date',
 					'_gt': '2012-01-01'
 				},
 				price: {
-					'type': 'double',
 					'_gte': 10,
 					'_lt': 20.5
 				}
@@ -90,7 +85,6 @@ $(document).ready(function () {
 		value: {
 			where: {
 				price: {
-					'type': 'double',
 					'_gte': 10
 				}
 			},
