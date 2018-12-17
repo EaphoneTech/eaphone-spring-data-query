@@ -38,6 +38,9 @@ public class SpecificationBuilder<T> extends AbstractPredicateBuilder<Specificat
         @Override
         public Predicate toPredicate(@NonNull Root<S> root, @NonNull CriteriaQuery<?> query,
                 @NonNull CriteriaBuilder criteriaBuilder) {
+        	columnPredicates = new ArrayList<>();
+        	globalPredicates = new ArrayList<>();
+
             initPredicatesRecursively(tree, root, root, criteriaBuilder);
 
             boolean isCountQuery = query.getResultType() == Long.class;
@@ -60,10 +63,14 @@ public class SpecificationBuilder<T> extends AbstractPredicateBuilder<Specificat
             for (Node<Filter> child : node.getChildren()) {
                 Path<Object> path = from.get(child.getName());
                 if (path instanceof AbstractPathImpl) {
-                    if (((AbstractPathImpl<?>) path).getAttribute().isCollection()) {
-                        // ignore OneToMany and ManyToMany relationships
-                        continue;
-                    }
+					// OneToOne and ManyToOne relationships
+//					if (((AbstractPathImpl<?>) path).getAttribute().isAssociation()) {
+//						continue;
+//					}
+					// OneToMany and ManyToMany relationships
+//					if (((AbstractPathImpl<?>) path).getAttribute().isCollection()) {
+//						continue;
+//					}
                 }
                 if (child.isLeaf()) {
                     initPredicatesRecursively(child, from, fetch, criteriaBuilder);
