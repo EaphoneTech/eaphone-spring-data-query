@@ -27,9 +27,7 @@ import org.springframework.util.StringUtils;
 
 import com.eaphonetech.common.datatables.model.mapping.ColumnType;
 import com.eaphonetech.common.datatables.model.mapping.QueryInput;
-import com.eaphonetech.common.datatables.model.mapping.filter.QueryField;
 import com.eaphonetech.common.datatables.model.mapping.filter.QueryFilter;
-import com.eaphonetech.common.datatables.mongodb.model.QueryCount;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Predicate;
 
