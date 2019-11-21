@@ -514,7 +514,7 @@ public class QueryUtils {
 
 		if (pageable != null) {
 			final Sort s = pageable.getSort();
-			if (s != null) {
+			if (s != null && !s.isUnsorted()) {
 				opList.add(sort(s));
 			}
 			opList.add(skip((long) pageable.getOffset()));
