@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.eaphonetech</groupId>
 		<artifactId>eaphone-spring-data-query-parent</artifactId>
-		<version>1.1.0-RELEASE</version>
+		<version>1.1.2-RELEASE</version>
 	</parent>
 
 	<artifactId>eaphone-spring-data-query-samples</artifactId>
@@ -54,7 +54,7 @@
 		<dependency>
 			<groupId>de.bwaldvogel</groupId>
 			<artifactId>mongo-java-server</artifactId>
-			<version>1.9.7</version>
+			<version>1.23.0</version>
 		</dependency>
 
 		<!-- h2 for fake mysql -->

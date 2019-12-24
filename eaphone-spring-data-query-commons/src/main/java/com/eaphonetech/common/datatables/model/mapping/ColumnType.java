@@ -29,6 +29,11 @@ public abstract class ColumnType {
 		this.comparable = isComparable;
 	}
 
+	@Override
+	public String toString() {
+		return code;
+	}
+
 	private static boolean is(Class<?> target, Class<?>... checkTypes) {
 		for (Class<?> checkClass : checkTypes) {
 			if (target.isAssignableFrom(checkClass)) {

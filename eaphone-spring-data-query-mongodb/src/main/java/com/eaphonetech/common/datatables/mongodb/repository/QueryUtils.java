@@ -9,6 +9,8 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.sort
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -68,22 +70,28 @@ public class QueryUtils {
 		return value.stream().map(o -> type.tryConvert(o)).collect(Collectors.toList());
 	}
 
+	private static class ColumnTypeAndName {
+		private ColumnType type;
+		private String name;
+	}
+
 	/**
-	 * Recursively get field type
-	 * 
+	 * Find one possible field of nested name parts. 
 	 * @param javaType
 	 * @param fieldNameParts
 	 * @param currentIndex
-	 * @return
+	 * @return Never return <code>null</code>.
 	 */
-	private static ColumnType getFieldType(Class<?> javaType, String[] fieldNameParts, int currentIndex) {
-		if (javaType == null) {
-			return null;
-		}
+	private static ColumnTypeAndName getField(Class<?> javaType, String[] fieldNameParts, int currentIndex) {
 		Objects.requireNonNull(fieldNameParts);
+		ColumnTypeAndName result = new ColumnTypeAndName();
+		if (javaType == null) {
+			return result;
+		}
 
 		if (currentIndex <= fieldNameParts.length - 1) {
 			final String currentLevelName = fieldNameParts[currentIndex];
+			String decidedName = null;
 			Class<?> currentLevelFieldType = null;
 
 			// do logic and append more
@@ -112,7 +120,22 @@ public class QueryUtils {
 
 			if (possibleFields != null && !possibleFields.isEmpty()) {
 				for (final Field field : possibleFields) {
+					decidedName = field.getName();
+					// TODO: currentLevelFieldType = List<T>, should be T, got List
 					currentLevelFieldType = field.getType();
+
+					try {
+						Type t = field.getGenericType();
+						if (t != null && t instanceof ParameterizedType) {
+							ParameterizedType pti = (ParameterizedType) t;
+							Type tt = pti.getActualTypeArguments()[0];
+							if (tt instanceof Class) {
+								currentLevelFieldType = (Class<?>) tt;
+							}
+						}
+					} catch (Exception ex) {
+						log.debug("Caught unhandled exception", ex);
+					}
 					break;
 				}
 			}
@@ -122,17 +145,32 @@ public class QueryUtils {
 			}
 
 			if (currentIndex < fieldNameParts.length - 1) {
-				ColumnType childrenFieldType = getFieldType(currentLevelFieldType, fieldNameParts, currentIndex + 1);
-				if (childrenFieldType == null) {
-					return null;
+				ColumnTypeAndName childrenField = getField(currentLevelFieldType, fieldNameParts, currentIndex + 1);
+				if (childrenField == null) {
+					result.type = null;
+					result.name = decidedName;
 				} else {
-					return childrenFieldType;
+					result.type = childrenField.type;
+					result.name = decidedName + "." + childrenField.name;
 				}
 			} else {
-				return ColumnType.parse(currentLevelFieldType);
+				result.type = ColumnType.parse(currentLevelFieldType);
+				result.name = decidedName;
 			}
 		}
-		return null;
+		return result;
+	}
+
+	/**
+	 * Recursively get field type
+	 * 
+	 * @param javaType
+	 * @param fieldNameParts
+	 * @param currentIndex
+	 * @return
+	 */
+	private static ColumnType getFieldType(Class<?> javaType, String[] fieldNameParts, int currentIndex) {
+		return getField(javaType, fieldNameParts, currentIndex).type;
 	}
 
 	/**
@@ -168,64 +206,7 @@ public class QueryUtils {
 	 * @return
 	 */
 	private static String getFieldName(Class<?> javaType, String[] fieldNameParts, int currentIndex) {
-		if (javaType == null) {
-			return null;
-		}
-		Objects.requireNonNull(fieldNameParts);
-
-		if (currentIndex <= fieldNameParts.length - 1) {
-			final String currentLevelName = fieldNameParts[currentIndex];
-			String decidedName = null;
-			Class<?> currentLevelFieldType = null;
-
-			// do logic and append more
-			@SuppressWarnings("unchecked")
-			Set<Field> possibleFields = ReflectionUtils.getAllFields(javaType, new Predicate<Field>() {
-				@Override
-				public boolean apply(@Nullable Field input) {
-					if (input != null) {
-						if (currentLevelName.equals(input.getName())) {
-							return true;
-						} else if (IS_JACKSON_AVAILABLE) {
-							// direct matching with @JsonProperty
-							final JsonProperty jsonProperty = input.getAnnotation(JsonProperty.class);
-							if (jsonProperty != null && StringUtils.hasLength(jsonProperty.value())) {
-								if (currentLevelName.equals(jsonProperty.value())) {
-									return true;
-								}
-							}
-
-							// TODO: Jackson PropertyNamingStrategy should also be considered
-						}
-					}
-					return false;
-				}
-			});
-
-			if (possibleFields != null && !possibleFields.isEmpty()) {
-				for (final Field field : possibleFields) {
-					decidedName = field.getName();
-					currentLevelFieldType = field.getType();
-					break;
-				}
-			}
-
-			if (StringUtils.isEmpty(decidedName)) {
-				return null;
-			}
-
-			if (currentIndex < fieldNameParts.length - 1) {
-				String childrenFieldName = getFieldName(currentLevelFieldType, fieldNameParts, currentIndex + 1);
-				if (childrenFieldName == null) {
-					return null;
-				} else {
-					return decidedName + "." + childrenFieldName;
-				}
-			} else {
-				return decidedName;
-			}
-		}
-		return null;
+		return getField(javaType, fieldNameParts, currentIndex).name;
 	}
 
 	/**
