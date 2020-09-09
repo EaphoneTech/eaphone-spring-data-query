@@ -2,7 +2,7 @@
 
 This is a simple Spring Boot project using [biggates/eaphone-spring-data-query](https://github.com/biggates/eaphone-spring-data-query).
 
-The original sample project is [darrachequesne/spring-data-jpa-datatables-sample](https://github.com/darrachequesne/spring-data-jpa-datatables-sample) 
+The original sample project is [darrachequesne/spring-data-jpa-datatables-sample](https://github.com/darrachequesne/spring-data-jpa-datatables-sample).
 
 ## How to run ##
 
@@ -44,7 +44,7 @@ On the page you can try the following features:
 
 ### mongodb ###
 
-* This project uses [fakemongo/fongo](https://github.com/fakemongo/fongo) to create an in-memory MongoDB server named `test` (see `SampleConfiguration`).
+* This project uses [bwaldvogel/mongo-java-server](https://github.com/bwaldvogel/mongo-java-server) to create an in-memory MongoDB server named `test` (see `MongodbSampleApplication$Config`).
 
 * The params `startDate` and `endDate` is used to restrict the range of a value. DataTables only handles "match" type of search, which is usually not enough. The criteria and `preFiltering` is used to further define a criteria.  
 
