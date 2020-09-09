@@ -19,8 +19,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
-
 import org.reflections.ReflectionUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -36,7 +34,6 @@ import com.eaphonetech.common.datatables.model.mapping.ColumnType;
 import com.eaphonetech.common.datatables.model.mapping.QueryInput;
 import com.eaphonetech.common.datatables.model.mapping.filter.QueryFilter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Predicate;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -96,26 +93,23 @@ public class QueryUtils {
 
 			// do logic and append more
 			@SuppressWarnings("unchecked")
-			Set<Field> possibleFields = ReflectionUtils.getAllFields(javaType, new Predicate<Field>() {
-				@Override
-				public boolean apply(@Nullable Field input) {
-					if (input != null) {
-						if (currentLevelName.equals(input.getName())) {
-							return true;
-						} else if (IS_JACKSON_AVAILABLE) {
-							// direct matching with @JsonProperty
-							final JsonProperty jsonProperty = input.getAnnotation(JsonProperty.class);
-							if (jsonProperty != null && StringUtils.hasLength(jsonProperty.value())) {
-								if (currentLevelName.equals(jsonProperty.value())) {
-									return true;
-								}
+			Set<Field> possibleFields = ReflectionUtils.getAllFields(javaType, input -> {
+				if (input != null) {
+					if (currentLevelName.equals(input.getName())) {
+						return true;
+					} else if (IS_JACKSON_AVAILABLE) {
+						// direct matching with @JsonProperty
+						final JsonProperty jsonProperty = input.getAnnotation(JsonProperty.class);
+						if (jsonProperty != null && StringUtils.hasLength(jsonProperty.value())) {
+							if (currentLevelName.equals(jsonProperty.value())) {
+								return true;
 							}
-
-							// TODO: Jackson PropertyNamingStrategy should also be considered
 						}
+
+						// TODO: Jackson PropertyNamingStrategy should also be considered
 					}
-					return false;
 				}
+				return false;
 			});
 
 			if (possibleFields != null && !possibleFields.isEmpty()) {
