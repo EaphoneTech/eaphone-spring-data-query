@@ -135,7 +135,7 @@ public class QueryUtils {
 			}
 
 			if (currentLevelFieldType == null) {
-				return null;
+				return result;
 			}
 
 			if (currentIndex < fieldNameParts.length - 1) {
@@ -241,6 +241,9 @@ public class QueryUtils {
 			final QueryFilter filter = entry.getValue();
 			final String fieldName = entry.getKey();
 			final ColumnType type = getFieldType(entityInformation.getJavaType(), fieldName);
+			if (type == null) {
+				throw new RuntimeException(String.format("field [%s] not exists", fieldName));
+			}
 			// handle column.filter
 			if (filter != null) {
 				boolean hasValidCrit = false;
