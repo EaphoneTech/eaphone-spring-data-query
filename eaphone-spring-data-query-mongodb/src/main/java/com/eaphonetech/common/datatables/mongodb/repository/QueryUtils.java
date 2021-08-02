@@ -328,9 +328,16 @@ public class QueryUtils {
 	 * @param input the {@link QueryInput} mapped from the Ajax request
 	 * @return a {@link Pageable}, must not be {@literal null}.
 	 */
-	public static Pageable getPageable(QueryInput input) {
+	public static <T, ID extends Serializable> Pageable getPageable(MongoEntityInformation<T, ID> entityInformation,
+			QueryInput input) {
 		List<Order> orders = input.getOrders();
-		Sort sort = orders.isEmpty() ? Sort.unsorted() : Sort.by(orders);
+
+		// handle JsonProperty annotation
+		Sort sort = orders.isEmpty() ? Sort.unsorted()
+				: Sort.by(orders.stream()
+						.map(o -> new Sort.Order(o.getDirection(),
+								getFieldName(entityInformation.getJavaType(), o.getProperty())))
+						.collect(Collectors.toList()));
 
 		if (input.getLimit() == -1) {
 			input.setLimit(Integer.MAX_VALUE);

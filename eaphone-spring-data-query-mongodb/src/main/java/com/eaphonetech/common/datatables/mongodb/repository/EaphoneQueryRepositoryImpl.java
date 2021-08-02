@@ -123,7 +123,7 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
 				query.addCriteria(preFilteringCriteria);
 			}
 
-			Pageable pageable = QueryUtils.getPageable(input);
+			Pageable pageable = QueryUtils.getPageable(this.entityInformation, input);
 
 			Page<T> data = findAll(query, pageable);
 
@@ -204,7 +204,7 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
 
 	private <View> Page<View> findPage(MongoEntityInformation<T, ID> entityInformation, Class<View> classOfView,
 			QueryInput input, AggregationOperation... operations) {
-		final Pageable pageable = QueryUtils.getPageable(input);
+		final Pageable pageable = QueryUtils.getPageable(entityInformation, input);
 
 		final TypedAggregation<T> aggWithPage = QueryUtils.makeAggregation(entityInformation.getJavaType(), input,
 				pageable, operations);
