@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -336,7 +337,8 @@ public class QueryUtils {
 		Sort sort = orders.isEmpty() ? Sort.unsorted()
 				: Sort.by(orders.stream()
 						.map(o -> new Sort.Order(o.getDirection(),
-								getFieldName(entityInformation.getJavaType(), o.getProperty())))
+								Optional.ofNullable(getFieldName(entityInformation.getJavaType(), o.getProperty()))
+										.orElse(o.getProperty())))
 						.collect(Collectors.toList()));
 
 		if (input.getLimit() == -1) {
