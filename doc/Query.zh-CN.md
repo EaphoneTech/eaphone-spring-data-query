@@ -29,6 +29,7 @@
             "_ne": "",
             "_in": [],
             "_nin": [],
+            "_all": [],
             "_regex": "",
             "_like": "",
             "_exists": true,
