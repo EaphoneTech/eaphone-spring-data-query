@@ -11,8 +11,6 @@ import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 
-import com.eaphonetech.common.datatables.jpa.repository.EaphoneQueryRepositoryImpl;
-
 /**
  * {@link FactoryBean} creating DataTablesRepositoryFactory instances.
  * 

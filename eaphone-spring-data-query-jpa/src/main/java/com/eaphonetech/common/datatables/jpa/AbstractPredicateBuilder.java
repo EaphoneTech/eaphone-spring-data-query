@@ -3,9 +3,9 @@ package com.eaphonetech.common.datatables.jpa;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.NonNull;
 
 import com.eaphonetech.common.datatables.model.mapping.QueryInput;
 import com.eaphonetech.common.datatables.model.mapping.filter.QueryFilter;
@@ -52,65 +52,9 @@ abstract class AbstractPredicateBuilder<T> {
 		if (input.getLimit() == -1) {
 			input.setLimit(Integer.MAX_VALUE);
 		}
-		return new DataTablesPageRequest(input.getOffset(), input.getLimit(), sort);
+		return PageRequest.of(input.getOffset() / input.getLimit(), input.getLimit(), sort);
 	}
 
 	public abstract T build();
-
-	private class DataTablesPageRequest implements Pageable {
-		private final int offset;
-		private final int limit;
-		private final Sort sort;
-
-		DataTablesPageRequest(int offset, int limit, Sort sort) {
-			this.offset = offset;
-			this.limit = limit;
-			this.sort = sort;
-		}
-
-		@Override
-		public long getOffset() {
-			return offset;
-		}
-
-		@Override
-		public int getPageSize() {
-			return limit;
-		}
-
-		@Override
-		@NonNull
-		public Sort getSort() {
-			return sort;
-		}
-
-		@Override
-		@NonNull
-		public Pageable next() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		@NonNull
-		public Pageable previousOrFirst() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		@NonNull
-		public Pageable first() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public boolean hasPrevious() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public int getPageNumber() {
-			throw new UnsupportedOperationException();
-		}
-	}
 
 }
