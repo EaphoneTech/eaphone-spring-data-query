@@ -25,6 +25,26 @@ $(document).ready(function () {
 			}
 		}
 	}, {
+		summary: 'Single regex filter',
+		description: 'Filter with regular expression',
+		value: {
+			where: {
+				orderNumber: {
+					'_regex': 'O1..[25].*'
+				}
+			}
+		}
+	}, {
+		summary: 'SQL Like',
+		description: 'Query using SQL like (%)',
+		value: {
+			where: {
+				"orderNumber": {
+					"_like": "O100%"
+				}
+			}
+		}
+	}, {
 		summary: 'Single comparison filter',
 		description: 'Comparison filter on single column',
 		value: {
@@ -45,12 +65,22 @@ $(document).ready(function () {
 			}
 		}
 	}, {
+		summary: 'Boolean search',
+		description: 'Search with boolean values',
+		value: {
+			where: {
+				isValid: {
+					'_eq': true
+				}
+			}
+		}
+	}, {
 		summary: 'Enumeration (in)',
 		description: 'Enumeration with number',
 		value: {
 			where: {
 				amount: {
-					'_in': [5, 9, 13]
+					'_in': [2, 3, 5]
 				}
 			}
 		}
@@ -60,22 +90,32 @@ $(document).ready(function () {
 		value: {
 			where: {
 				price: {
-					'_gte': 10,
-					'_lt': 20.5
+					'_gte': 50,
+					'_lt': 200
 				}
 			}
 		}
 	}, {
 		summary: 'Multiple columns',
-		description: 'More where on multiple columns',
+		description: 'More criteria on multiple columns (AND)',
 		value: {
 			where: {
 				date: {
 					'_gt': '2012-01-01'
 				},
 				price: {
-					'_gte': 10,
-					'_lt': 20.5
+					'_gte': 50,
+					'_lt': 200
+				}
+			}
+		}
+	}, {
+		summary: 'Empty array',
+		description: 'Search for empty array',
+		value: {
+			where: {
+				items: {
+					'_eq': []
 				}
 			}
 		}
@@ -100,16 +140,6 @@ $(document).ready(function () {
 			}, {
 				'price': 'asc'
 			}]
-		}
-	}, {
-		summary: 'Like',
-		description: 'SQL like',
-		value: {
-			where: {
-				"orderNumber": {
-					"_like": "O100%"
-				}
-			}
 		}
 	}];
 	
