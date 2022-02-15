@@ -30,6 +30,7 @@ import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import com.eaphonetech.common.datatables.model.mapping.ColumnType;
@@ -76,7 +77,7 @@ public class QueryUtils {
 	}
 
 	/**
-	 * Find one possible field of nested name parts. 
+	 * Find one possible field of nested name parts.
 	 * @param javaType
 	 * @param fieldNameParts
 	 * @param currentIndex
@@ -160,7 +161,7 @@ public class QueryUtils {
 
 	/**
 	 * Recursively get field type
-	 * 
+	 *
 	 * @param javaType
 	 * @param fieldNameParts
 	 * @param currentIndex
@@ -173,13 +174,13 @@ public class QueryUtils {
 	/**
 	 * Determine actual MongoDB field type from input
 	 * (including jackson-databind, etc.)
-	 * 
+	 *
 	 * @param javaType actual java type
 	 * @param fieldName frontend provided field name
 	 * @return
 	 */
 	private static ColumnType getFieldType(Class<?> javaType, String fieldName) {
-		if (javaType == null || StringUtils.isEmpty(fieldName)) {
+		if (javaType == null || ObjectUtils.isEmpty(fieldName)) {
 			return null;
 		}
 
@@ -196,7 +197,7 @@ public class QueryUtils {
 
 	/**
 	 * Recursively get field name
-	 * 
+	 *
 	 * @param javaType
 	 * @param fieldNameParts
 	 * @param currentIndex
@@ -209,13 +210,13 @@ public class QueryUtils {
 	/**
 	 * Determine actual MongoDB field name from input
 	 * (including jackson-databind, etc.)
-	 * 
+	 *
 	 * @param javaType actual java type
 	 * @param fieldName frontend provided field name
 	 * @return
 	 */
 	private static String getFieldName(Class<?> javaType, String fieldName) {
-		if (javaType == null || StringUtils.isEmpty(fieldName)) {
+		if (javaType == null || ObjectUtils.isEmpty(fieldName)) {
 			return null;
 		}
 
@@ -232,7 +233,7 @@ public class QueryUtils {
 
 	/**
 	 * Convert a {@link QueryInput} to Criteia
-	 * 
+	 *
 	 * @param input
 	 * @return
 	 */
@@ -268,6 +269,11 @@ public class QueryUtils {
 
 					if (filter.get_nin() != null) {
 						c.nin(convertArray(type, filter.get_nin()));
+						hasValidCrit = true;
+					}
+
+					if (filter.get_all() != null) {
+						c.all(convertArray(type, filter.get_all()));
 						hasValidCrit = true;
 					}
 
@@ -327,7 +333,7 @@ public class QueryUtils {
 
 	/**
 	 * Creates a '$sort' clause for the given {@link QueryInput}.
-	 * 
+	 *
 	 * @param <T> generic
 	 * @param <ID> generic
 	 * @param entityInformation {@link MongoEntityInformation}
@@ -349,12 +355,12 @@ public class QueryUtils {
 		if (input.getLimit() == -1) {
 			input.setLimit(Integer.MAX_VALUE);
 		}
-		return new DataTablesPageRequest(input.getOffset(), input.getLimit(), sort);
+		return PageRequest.of(input.getOffset() / input.getLimit(), input.getLimit(), sort);
 	}
 
 	/**
 	 * "LIKE" search is converted to $regex
-	 * 
+	 *
 	 * @param filterValue filter value
 	 * @return
 	 */
@@ -438,7 +444,7 @@ public class QueryUtils {
 
 	/**
 	 * Convert {@link QueryInput} to {@link AggregationOperation}[], mainly for column searches.
-	 * 
+	 *
 	 * @param input
 	 * @return
 	 */
@@ -458,7 +464,7 @@ public class QueryUtils {
 	 * Create an {@link TypedAggregation} with specified {@link QueryInput} as filter, plus specified
 	 * {@link AggregationOperation}[], but only act as <code>$count</code>
 	 * <p>This basically creates an aggregation pipeline as follows:</p>
-	 * 
+	 *
 	 * <pre>
 	 * <code>
 	 * [
@@ -467,7 +473,7 @@ public class QueryUtils {
 	 * ]
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * @param entityInformation {@link MongoEntityInformation}
 	 * @param input the {@link QueryInput} mapped from the Ajax request
 	 * @param operations aggregation operations
@@ -491,7 +497,7 @@ public class QueryUtils {
 	/**
 	 * Create an {@link TypedAggregation} with specified {@link QueryInput} as filter, plus specified
 	 * {@link AggregationOperation}[]
-	 * 
+	 *
 	 * @param classOfT
 	 * @param input
 	 * @param pageable
@@ -521,7 +527,7 @@ public class QueryUtils {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param <T>
 	 * @param <ID>
 	 * @param entityInformation
@@ -541,7 +547,7 @@ public class QueryUtils {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param input
 	 * @param entityInformation
 	 * @return
