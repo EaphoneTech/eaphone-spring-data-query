@@ -6,7 +6,6 @@ import java.util.Map;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.lang.NonNull;
 
 import com.eaphonetech.common.datatables.model.mapping.CountInput;
 import com.eaphonetech.common.datatables.model.mapping.QueryInput;
@@ -71,7 +70,7 @@ abstract class AbstractPredicateBuilder<T> {
 		if (input.getLimit() == -1) {
 			input.setLimit(Integer.MAX_VALUE);
 		}
-		return new DataTablesPageRequest(input.getOffset(), input.getLimit(), sort);
+		return PageRequest.of(input.getOffset() / input.getLimit(), input.getLimit(), sort);
 	}
 
 	public abstract T build();

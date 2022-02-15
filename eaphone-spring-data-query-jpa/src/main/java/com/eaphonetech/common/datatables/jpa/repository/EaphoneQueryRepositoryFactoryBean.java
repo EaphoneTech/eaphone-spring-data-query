@@ -13,7 +13,7 @@ import jakarta.persistence.EntityManager;
 
 /**
  * {@link FactoryBean} creating DataTablesRepositoryFactory instances.
- * 
+ *
  * @author Damien Arrachequesne
  */
 public class EaphoneQueryRepositoryFactoryBean<R extends JpaRepository<T, ID>, T, ID extends Serializable>
