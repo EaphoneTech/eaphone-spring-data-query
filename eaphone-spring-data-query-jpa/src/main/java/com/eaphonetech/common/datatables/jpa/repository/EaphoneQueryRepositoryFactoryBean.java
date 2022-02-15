@@ -15,7 +15,7 @@ import com.eaphonetech.common.datatables.jpa.repository.EaphoneQueryRepositoryIm
 
 /**
  * {@link FactoryBean} creating DataTablesRepositoryFactory instances.
- * 
+ *
  * @author Damien Arrachequesne
  */
 public class EaphoneQueryRepositoryFactoryBean<R extends JpaRepository<T, ID>, T, ID extends Serializable>
