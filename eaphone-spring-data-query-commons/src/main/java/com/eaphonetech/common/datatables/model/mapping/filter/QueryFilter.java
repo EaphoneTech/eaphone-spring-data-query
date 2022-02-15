@@ -14,6 +14,7 @@ public class QueryFilter {
     private Object _ne;
     private List<Object> _in;
     private List<Object> _nin;
+    private List<Object> _all;
     private String _regex;
     private String _like;
     private Boolean _exists;

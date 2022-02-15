@@ -1,10 +1,10 @@
 package com.eaphonetech.common.datatables.samples.mongo.document;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -47,7 +47,7 @@ public class Order {
 	private double price;
 
 	@JsonView(QueryOutput.View.class)
-	private Set<OrderItem> items;
+	private List<OrderItem> items;
 
 	@Transient
 	public static Order random() {
@@ -62,28 +62,26 @@ public class Order {
 
 		o.isValid = r.nextBoolean();
 
-		o.amount = r.nextInt(25);
-
 		o.price = Math.round(100.0 * 100.0 * r.nextDouble()) / 100.0;
 
-		Set<OrderItem> items = new HashSet<>();
-		for (int i = 0; i < r.nextInt(8); i++) {
-			int amount = r.nextInt(25);
-			double price = Math.round(100.0 * 100.0 * r.nextDouble()) / 100.0;
+		List<OrderItem> items = new ArrayList<>();
+		int itemsCount = r.nextInt(5);
+		int preciseTotalPrice = 0;
+		for (int i = 0; i < itemsCount; i++) {
+			int preciseItemPrice = r.nextInt(10000);
 
 			OrderItem item = new OrderItem();
 			item.setId(new ObjectId().toHexString());
 			item.setName(o.getOrderNumber() + "_" + i);
-			item.setAmount(amount);
-			item.setPrice(price);
-			item.setDate(o.getDate());
-			item.setValid(o.isValid());
+			item.setPrice((double) preciseItemPrice / 100.0);
 			items.add(item);
 
-			o.setAmount(o.getAmount() + amount);
-			o.setPrice(o.getPrice() + price);
+			preciseTotalPrice += preciseItemPrice;
 		}
+		o.setPrice((double) preciseTotalPrice / 100.0);
 		o.setItems(items);
+
+		o.amount = itemsCount;
 
 		return o;
 	}

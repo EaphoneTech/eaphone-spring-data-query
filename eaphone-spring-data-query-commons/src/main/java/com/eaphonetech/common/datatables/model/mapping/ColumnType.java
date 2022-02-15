@@ -14,12 +14,14 @@ public abstract class ColumnType {
 	private static final String CODE_DOUBLE = "double";
 	private static final String CODE_DATE = "date";
 	private static final String CODE_BOOLEAN = "boolean";
+	private static final String CODE_NESTED_OBJECT = "object";
 
 	public static final ColumnType STRING = new StringColumnType();
 	public static final ColumnType INTEGER = new IntegerColumnType();
 	public static final ColumnType DOUBLE = new DoubleColumnType();
 	public static final ColumnType DATE = new DateColumnType();
 	public static final ColumnType BOOLEAN = new BooleanColumnType();
+	public static final ColumnType NESTED_OBJECT = new NestedObjectColumnType();
 
 	private String code;
 	private boolean comparable;
@@ -51,19 +53,18 @@ public abstract class ColumnType {
 
 		if (c.isPrimitive()) {
 			// boolean, byte, char, short, int, long, float, and double.
-			if (is(c, char.class)) {
-				// TODO: whether type 'char' should be STRING or INTEGER?
-				return STRING;
-			} else if (is(c, byte.class, short.class, int.class, long.class)) {
+			 if (is(c, byte.class, char.class, short.class, int.class, long.class)) {
 				return INTEGER;
 			} else if (is(c, float.class, double.class)) {
 				return DOUBLE;
 			} else if (is(c, boolean.class)) {
 				return BOOLEAN;
 			} else {
-				// unexpected primitive type
+				// unexpected primitive type: void
 				throw new IllegalArgumentException(String.format("unexpected type '%s'", c.toString()));
 			}
+		} else if (c.isEnum()) {
+			return STRING;
 		} else if (c.isArray()) {
 			// TODO how to check array?
 			// c.getComponentType() is type of array item;
@@ -79,6 +80,9 @@ public abstract class ColumnType {
 				return BOOLEAN;
 			} else if (is(c, Date.class)) {
 				return DATE;
+			} else {
+				// nested class
+				return NESTED_OBJECT;
 			}
 		}
 		return STRING;
@@ -159,6 +163,17 @@ public abstract class ColumnType {
 		@Override
 		public Object tryConvert(Object o) {
 			return o == null ? null : Boolean.parseBoolean(o.toString());
+		}
+	}
+
+	static final class NestedObjectColumnType extends ColumnType {
+		NestedObjectColumnType() {
+			super(CODE_NESTED_OBJECT, false);
+		}
+
+		@Override
+		public Object tryConvert(Object o) {
+			return o == null ? null : o;
 		}
 	}
 

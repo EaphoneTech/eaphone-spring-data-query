@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.reflections.ReflectionUtils;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -29,6 +30,7 @@ import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import com.eaphonetech.common.datatables.model.mapping.ColumnType;
@@ -177,7 +179,7 @@ public class QueryUtils {
 	 * @return
 	 */
 	private static ColumnType getFieldType(Class<?> javaType, String fieldName) {
-		if (javaType == null || StringUtils.isEmpty(fieldName)) {
+		if (javaType == null || ObjectUtils.isEmpty(fieldName)) {
 			return null;
 		}
 
@@ -213,7 +215,7 @@ public class QueryUtils {
 	 * @return
 	 */
 	private static String getFieldName(Class<?> javaType, String fieldName) {
-		if (javaType == null || StringUtils.isEmpty(fieldName)) {
+		if (javaType == null || ObjectUtils.isEmpty(fieldName)) {
 			return null;
 		}
 
@@ -266,6 +268,11 @@ public class QueryUtils {
 
 					if (filter.get_nin() != null) {
 						c.nin(convertArray(type, filter.get_nin()));
+						hasValidCrit = true;
+					}
+					
+					if (filter.get_all() != null) {
+						c.all(convertArray(type, filter.get_all()));
 						hasValidCrit = true;
 					}
 
@@ -344,7 +351,7 @@ public class QueryUtils {
 		if (input.getLimit() == -1) {
 			input.setLimit(Integer.MAX_VALUE);
 		}
-		return new DataTablesPageRequest(input.getOffset(), input.getLimit(), sort);
+		return PageRequest.of(input.getOffset() / input.getLimit(), input.getLimit(), sort);
 	}
 
 	/**
@@ -371,59 +378,6 @@ public class QueryUtils {
 		}
 		pattern = pattern.replaceAll("%", ".*");
 		return Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
-	}
-
-	private static class DataTablesPageRequest implements Pageable {
-
-		private final int offset;
-		private final int limit;
-		private final Sort sort;
-
-		public DataTablesPageRequest(int offset, int limit, Sort sort) {
-			this.offset = offset;
-			this.limit = limit;
-			this.sort = sort;
-		}
-
-		@Override
-		public long getOffset() {
-			return offset;
-		}
-
-		@Override
-		public int getPageSize() {
-			return limit;
-		}
-
-		@Override
-		public Sort getSort() {
-			return sort;
-		}
-
-		@Override
-		public Pageable next() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Pageable previousOrFirst() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Pageable first() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public boolean hasPrevious() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public int getPageNumber() {
-			throw new UnsupportedOperationException();
-		}
 	}
 
 	/**
