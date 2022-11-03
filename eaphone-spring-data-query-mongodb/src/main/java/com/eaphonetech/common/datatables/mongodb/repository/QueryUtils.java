@@ -32,6 +32,7 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
 import org.springframework.util.StringUtils;
 
 import com.eaphonetech.common.datatables.model.mapping.ColumnType;
+import com.eaphonetech.common.datatables.model.mapping.CountInput;
 import com.eaphonetech.common.datatables.model.mapping.QueryInput;
 import com.eaphonetech.common.datatables.model.mapping.filter.QueryFilter;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -508,6 +509,121 @@ public class QueryUtils {
 			opList.add(limit(pageable.getPageSize()));
 		}
 		return newAggregation(classOfT, opList);
+	}
+
+	/**
+	 * 
+	 * @param <T>
+	 * @param <ID>
+	 * @param entityInformation
+	 * @param input
+	 * @return
+	 */
+	public static <T, ID extends Serializable> Query getQuery(MongoEntityInformation<T, ID> entityInformation,
+			CountInput input) {
+		Query q = new Query();
+		List<Criteria> criteriaList = getCriteria(input, entityInformation);
+		if (criteriaList != null) {
+			for (final Criteria c : criteriaList) {
+				q.addCriteria(c);
+			}
+		}
+		return q;
+	}
+
+	/**
+	 * 
+	 * @param input
+	 * @param entityInformation
+	 * @return
+	 */
+	private static <T, ID extends Serializable> List<Criteria> getCriteria(CountInput input,
+			MongoEntityInformation<T, ID> entityInformation) {
+		List<Criteria> result = new LinkedList<>();
+		// check for each searchable column whether a filter value exists
+		for (final Map.Entry<String, QueryFilter> entry : input.entrySet()) {
+			final QueryFilter filter = entry.getValue();
+			final String fieldName = entry.getKey();
+			final ColumnType type = getFieldType(entityInformation.getJavaType(), fieldName);
+			if (type == null) {
+				throw new RuntimeException(String.format("field [%s] not exists", fieldName));
+			}
+			// handle column.filter
+			if (filter != null) {
+				boolean hasValidCrit = false;
+				Criteria c = Criteria.where(getFieldName(entityInformation.getJavaType(), fieldName));
+				if (filter.get_eq() != null) {
+					// $eq takes first place
+					c.is(type.tryConvert(filter.get_eq()));
+					hasValidCrit = true;
+				} else if (filter.get_ne() != null) {
+					// $ne
+					c.ne(type.tryConvert(filter.get_ne()));
+					hasValidCrit = true;
+				} else {
+					if (filter.get_in() != null) {
+						// $in takes second place
+						c.in(convertArray(type, filter.get_in()));
+						hasValidCrit = true;
+					}
+
+					if (filter.get_nin() != null) {
+						c.nin(convertArray(type, filter.get_nin()));
+						hasValidCrit = true;
+					}
+
+					if (StringUtils.hasLength(filter.get_regex())) {
+						// $regex also works here
+						c.regex(filter.get_regex());
+						hasValidCrit = true;
+					} else if (StringUtils.hasLength(filter.get_like())) {
+						// like is converted to $regex
+						c.regex(getLikeFilterPattern(filter.get_like()));
+						hasValidCrit = true;
+					}
+
+					if (filter.get_null() != null && filter.get_null().booleanValue()) {
+						c.is(null);
+						hasValidCrit = true;
+					}
+
+					if (filter.get_empty() != null && filter.get_empty().booleanValue()) {
+						c.is("");
+						hasValidCrit = true;
+					}
+
+					if (filter.get_exists() != null) {
+						c.exists(filter.get_exists().booleanValue());
+						hasValidCrit = true;
+					}
+
+					if (type.isComparable()) {
+						// $gt, $lt, etc. only works if type is comparable
+						if (filter.get_gt() != null) {
+							c.gt(type.tryConvert(filter.get_gt()));
+							hasValidCrit = true;
+						}
+						if (filter.get_gte() != null) {
+							c.gte(type.tryConvert(filter.get_gte()));
+							hasValidCrit = true;
+						}
+						if (filter.get_lt() != null) {
+							c.lt(type.tryConvert(filter.get_lt()));
+							hasValidCrit = true;
+						}
+						if (filter.get_lte() != null) {
+							c.lte(type.tryConvert(filter.get_lte()));
+							hasValidCrit = true;
+						}
+					}
+				}
+				if (hasValidCrit) {
+					result.add(c);
+				}
+			}
+		}
+
+		return result;
 	}
 
 }

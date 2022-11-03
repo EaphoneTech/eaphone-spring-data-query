@@ -22,6 +22,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
 import org.springframework.data.mongodb.repository.support.SimpleMongoRepository;
 
+import com.eaphonetech.common.datatables.model.mapping.CountInput;
+import com.eaphonetech.common.datatables.model.mapping.CountOutput;
 import com.eaphonetech.common.datatables.model.mapping.QueryInput;
 import com.eaphonetech.common.datatables.model.mapping.QueryOutput;
 import com.eaphonetech.common.datatables.mongodb.model.QueryCount;
@@ -53,8 +55,13 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
 	}
 
 	private long count(Criteria crit) {
-		return this.mongoOperations.count(query(crit), this.entityInformation.getJavaType());
+		return count(query(crit));
 	}
+
+	private long count(Query query) {
+		return this.mongoOperations.count(query, this.entityInformation.getJavaType());
+	}
+
 
 	private Page<T> findAll(Query q, Pageable p) {
 		// count() -> estimatedDocumentCount()
@@ -228,6 +235,44 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
 		}
 
 		return new PageImpl<View>(result, pageable, count);
+	}
+
+	@Override
+	public CountOutput count(CountInput input) {
+		return count(input, null, null);
+	}
+
+	@Override
+	public CountOutput count(CountInput input, Criteria additionalCriteria) {
+		return count(input, additionalCriteria, null);
+	}
+
+	@Override
+	public CountOutput count(CountInput input, Criteria additionalCriteria, Criteria preFilteringCriteria) {
+		CountOutput output = new CountOutput();
+		try {
+			long recordsTotal = preFilteringCriteria == null ? count() : count(preFilteringCriteria);
+			if (recordsTotal == 0) {
+				return output;
+			}
+			output.setTotal(recordsTotal);
+
+			Query query = QueryUtils.getQuery(this.entityInformation, input);
+			if (additionalCriteria != null) {
+				query.addCriteria(additionalCriteria);
+			}
+
+			if (preFilteringCriteria != null) {
+				query.addCriteria(preFilteringCriteria);
+			}
+
+			output.setFiltered(count(query));
+		} catch (Exception e) {
+			output.setError(e.toString());
+			output.setFiltered(0L);
+			log.error("caught exception", e);
+		}
+		return output;
 	}
 
 }

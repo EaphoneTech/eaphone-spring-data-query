@@ -4,6 +4,8 @@ $(document).ready(function () {
 	 * <tr>s
 	 */
 	let $grid = $('#table-body');
+	/** $postUrl contains url (string) to post */
+	let $postUrl = $('#input-post-path');
 	/** $postInput contains data (string) to post */
 	let $postInput = $('#input-post-data');
 	/** $output is the element to display server response */
@@ -175,13 +177,15 @@ $(document).ready(function () {
 	/**
 	 * POST to server
 	 * 
+	 * @param {string} 
+	 *            url request url
 	 * @param {string}
 	 *            data request body
 	 */
-	let post = function (data) {
+	let post = function (url, data) {
 		let jsonModel = JSON.parse(data);
 		$.ajax({
-			url: '/data/orders/search',
+			url: url,
 			type: 'post',
 			data: data,
 			contentType: 'application/json; charset=UTF-8',
@@ -200,8 +204,9 @@ $(document).ready(function () {
 		$pagination.empty();
 		$output.empty();
 		
+		let requestUrl = $postUrl.val() || '';
 		let requestData = $postInput.val() || '{}';
-		post(requestData);
+		post(requestUrl, requestData);
 		return false;
 	});
 
