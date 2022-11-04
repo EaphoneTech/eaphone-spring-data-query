@@ -49,7 +49,8 @@ public interface JpaQueryRepository<T, ID extends Serializable>
 
 	/**
 	 * Returns the filtered list for the given {@link QueryInput}.
-	 *
+	 * 
+	 * @param <R> generic
 	 * @param input the {@link QueryInput} mapped from the Ajax request
 	 * @param additionalSpecification an additional {@link Specification} to apply to the query (with
 	 *            an "AND" clause)

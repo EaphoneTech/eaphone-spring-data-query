@@ -22,7 +22,7 @@ A short but working [example](eaphone-spring-data-query-samples).
 <dependency>
     <groupId>com.eaphonetech</groupId>
     <artifactId>eaphone-spring-data-query-jpa</artifactId>
-    <version>1.1.6.RELEASE</version>
+    <version>1.1.7</version>
 </dependency>
 ```
 
@@ -32,7 +32,7 @@ OR for MongoDB:
 <dependency>
     <groupId>com.eaphonetech</groupId>
     <artifactId>eaphone-spring-data-query-mongodb</artifactId>
-    <version>1.1.6.RELEASE</version>
+    <version>1.1.7</version>
 </dependency>
 ```
 
@@ -120,9 +120,14 @@ A repository has the following methods:
 ### Examples ###
 
 ```java
-@GetMapping("/data/orders")
-public QueryOutput<Order> getOrders(@Valid QueryInput input) {
+@PostMapping("/data/orders/search")
+public QueryOutput<Order> getOrdersByPost(@Valid @RequestBody QueryInput input) {
     return repo.findAll(input);
+}
+
+@PostMapping("/data/orders/count")
+public CountOutput count(@Valid @RequestBody CountInput input) {
+    return repo.count(input);
 }
 ```
 

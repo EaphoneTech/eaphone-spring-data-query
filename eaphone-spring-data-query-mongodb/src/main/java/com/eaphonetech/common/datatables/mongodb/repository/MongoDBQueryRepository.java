@@ -22,7 +22,7 @@ public interface MongoDBQueryRepository<T, ID extends Serializable> extends Eaph
 	 * Returns the filtered list for the given {@link QueryInput}.
 	 *
 	 * @param input the {@link QueryInput} mapped from the Ajax request
-	 * @param additionalSpecification an additional {@link Criteria} to apply to the query
+	 * @param additionalCriteria an additional {@link Criteria} to apply to the query
 	 *            (with an "AND" clause)
 	 * @return a {@link QueryOutput}
 	 */
@@ -32,9 +32,9 @@ public interface MongoDBQueryRepository<T, ID extends Serializable> extends Eaph
 	 * Returns the filtered list for the given {@link QueryInput}.
 	 *
 	 * @param input the {@link QueryInput} mapped from the Ajax request
-	 * @param additionalSpecification an additional {@link Criteria} to apply to the query
+	 * @param additionalCriteria an additional {@link Criteria} to apply to the query
 	 *            (with an "AND" clause)
-	 * @param preFilteringSpecification a pre-filtering {@link Criteria} to apply to the query
+	 * @param preFilteringCriteria a pre-filtering {@link Criteria} to apply to the query
 	 *            (with an "AND" clause)
 	 * @return a {@link QueryOutput}
 	 */
@@ -42,11 +42,12 @@ public interface MongoDBQueryRepository<T, ID extends Serializable> extends Eaph
 
 	/**
 	 * Find with type conversion
-	 * @param input
-	 * @param additionalCrit
-	 * @param preFilteringCrit
-	 * @param converter
-	 * @return
+	 * @param <View> generic
+	 * @param input the {@link QueryInput} mapped from the Ajax request
+	 * @param additionalCrit an additional {@link Criteria} to apply to the query
+	 * @param preFilteringCrit a pre-filtering {@link Criteria} to apply to the query
+	 * @param converter the {@link Function} to apply to the results of the query
+	 * @return a {@link QueryOutput}
 	 */
 	<View> QueryOutput<View> findAll(QueryInput input, Criteria additionalCrit, Criteria preFilteringCrit,
 			Function<T, View> converter);
@@ -54,20 +55,22 @@ public interface MongoDBQueryRepository<T, ID extends Serializable> extends Eaph
 	/**
 	 * Returns the filtered list for the given {@link QueryInput} using the given {@link TypedAggregation}
 	 * 
-	 * @param classOfView
-	 * @param input
-	 * @param operations
-	 * @return
+	 * @param <View> generic
+	 * @param classOfView class of view
+	 * @param input the {@link QueryInput} mapped from the Ajax request
+	 * @param operations aggregation operations
+	 * @return a {@link QueryOutput}
 	 */
 	<View> QueryOutput<View> findAll(Class<View> classOfView, QueryInput input, AggregationOperation... operations);
 
 	/**
 	 * Returns the filtered list for the given {@link QueryInput} using the given {@link TypedAggregation}
 	 * 
-	 * @param classOfView
-	 * @param input
-	 * @param operations
-	 * @return
+	 * @param <View> generic
+	 * @param classOfView class of view
+	 * @param input the {@link QueryInput} mapped from the Ajax request
+	 * @param operations aggregation operations
+	 * @return a {@link QueryOutput}
 	 */
 	<View> QueryOutput<View> findAll(Class<View> classOfView, QueryInput input,
 			Collection<? extends AggregationOperation> operations);
@@ -76,7 +79,7 @@ public interface MongoDBQueryRepository<T, ID extends Serializable> extends Eaph
 	 * Returns the filtered count for the given {@link CountInput}.
 	 *
 	 * @param input the {@link CountInput} mapped from the Ajax request
-	 * @param additionalSpecification an additional {@link Criteria} to apply to the query
+	 * @param additionalCriteria an additional {@link Criteria} to apply to the query
 	 *            (with an "AND" clause)
 	 * @return a {@link CountOutput}
 	 */
@@ -86,9 +89,9 @@ public interface MongoDBQueryRepository<T, ID extends Serializable> extends Eaph
 	 * Returns the filtered count for the given {@link CountInput}.
 	 *
 	 * @param input the {@link CountInput} mapped from the Ajax request
-	 * @param additionalSpecification an additional {@link Criteria} to apply to the query
+	 * @param additionalCriteria an additional {@link Criteria} to apply to the query
 	 *            (with an "AND" clause)
-	 * @param preFilteringSpecification a pre-filtering {@link Criteria} to apply to the query
+	 * @param preFilteringCriteria a pre-filtering {@link Criteria} to apply to the query
 	 *            (with an "AND" clause)
 	 * @return a {@link CountOutput}
 	 */

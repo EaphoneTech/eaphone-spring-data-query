@@ -327,6 +327,9 @@ public class QueryUtils {
 	/**
 	 * Creates a '$sort' clause for the given {@link QueryInput}.
 	 * 
+	 * @param <T> generic
+	 * @param <ID> generic
+	 * @param entityInformation {@link MongoEntityInformation}
 	 * @param input the {@link QueryInput} mapped from the Ajax request
 	 * @return a {@link Pageable}, must not be {@literal null}.
 	 */
@@ -351,7 +354,7 @@ public class QueryUtils {
 	/**
 	 * "LIKE" search is converted to $regex
 	 * 
-	 * @param filterValue
+	 * @param filterValue filter value
 	 * @return
 	 */
 	public static Pattern getLikeFilterPattern(String filterValue) {
@@ -459,10 +462,10 @@ public class QueryUtils {
 	 * </code>
 	 * </pre>
 	 * 
-	 * @param classOfT
-	 * @param input
-	 * @param operations
-	 * @return
+	 * @param entityInformation {@link MongoEntityInformation}
+	 * @param input the {@link QueryInput} mapped from the Ajax request
+	 * @param operations aggregation operations
+	 * @return a {@link TypedAggregation}
 	 */
 	public static <T, ID extends Serializable> TypedAggregation<T> makeAggregationCountOnly(
 			MongoEntityInformation<T, ID> entityInformation, QueryInput input, AggregationOperation[] operations) {
