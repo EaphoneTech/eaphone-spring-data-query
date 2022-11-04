@@ -5,7 +5,6 @@ import java.util.function.Function;
 
 import javax.persistence.EntityManager;
 
-import org.hibernate.Criteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
@@ -89,14 +88,30 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
 	}
 
 	@Override
-	public CountOutput count(CountInput input, Criteria additionalCriteria) {
-		return count(input, additionalCriteria, null);
+	public CountOutput count(CountInput input, Specification<T> additionalSpecification) {
+		return count(input, additionalSpecification, null);
 	}
 
 	@Override
-	public CountOutput count(CountInput input, Criteria additionalCriteria, Criteria preFilteringCriteria) {
+	public CountOutput count(CountInput input, Specification<T> additionalSpecification,
+			Specification<T> preFilteringSpecification) {
 		CountOutput output = new CountOutput();
-		// TODO: JPA support
+		try {
+			long recordsTotal = preFilteringSpecification == null ? count() : count(preFilteringSpecification);
+			if (recordsTotal == 0) {
+				return output;
+			}
+			output.setTotal(recordsTotal);
+
+			SpecificationBuilder<T> specificationBuilder = new SpecificationBuilder<>(input);
+			long filtered = count(Specification.where(specificationBuilder.build()).and(additionalSpecification)
+					.and(preFilteringSpecification));
+			output.setFiltered(filtered);
+		} catch (Exception e) {
+			output.setError(e.toString());
+			output.setFiltered(0L);
+			log.error("caught exception", e);
+		}
 
 		return output;
 	}

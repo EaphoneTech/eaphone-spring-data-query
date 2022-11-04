@@ -7,21 +7,39 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 
+import com.eaphonetech.common.datatables.model.mapping.CountInput;
 import com.eaphonetech.common.datatables.model.mapping.QueryInput;
 import com.eaphonetech.common.datatables.model.mapping.filter.QueryFilter;
 
 abstract class AbstractPredicateBuilder<T> {
 	protected final QueryInput input;
+	protected final CountInput countInput;
 	final Node<Filter> tree;
 
 	AbstractPredicateBuilder(QueryInput input) {
+		this.countInput = new CountInput();
 		this.input = input;
 		tree = new Node<>(null);
 		initTree(input);
 	}
 
+	AbstractPredicateBuilder(CountInput countInput) {
+		this.input = new QueryInput();
+		this.countInput = countInput;
+		tree = new Node<>(null);
+		initTree(countInput);
+	}
+
 	private void initTree(QueryInput input) {
 		for (Map.Entry<String, QueryFilter> entry : input.getWhere().entrySet()) {
+			final String fieldName = entry.getKey();
+			final QueryFilter filter = entry.getValue();
+			addChild(tree, 0, fieldName.split("\\."), filter);
+		}
+	}
+
+	private void initTree(CountInput input) {
+		for (Map.Entry<String, QueryFilter> entry : input.entrySet()) {
 			final String fieldName = entry.getKey();
 			final QueryFilter filter = entry.getValue();
 			addChild(tree, 0, fieldName.split("\\."), filter);

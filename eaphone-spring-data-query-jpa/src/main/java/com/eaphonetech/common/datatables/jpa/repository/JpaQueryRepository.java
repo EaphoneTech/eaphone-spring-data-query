@@ -3,7 +3,6 @@ package com.eaphonetech.common.datatables.jpa.repository;
 import java.io.Serializable;
 import java.util.function.Function;
 
-import org.hibernate.Criteria;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -64,24 +63,25 @@ public interface JpaQueryRepository<T, ID extends Serializable>
 
 	/**
 	 * Returns the filtered count for the given {@link CountInput}.
-	 *
+	 * 
 	 * @param input the {@link CountInput} mapped from the Ajax request
-	 * @param additionalSpecification an additional {@link Criteria} to apply to the query
-	 *            (with an "AND" clause)
+	 * @param additionalSpecification an additional {@link Specification} to apply to the query (with
+	 *            an "AND" clause)
 	 * @return a {@link CountOutput}
 	 */
-	CountOutput count(CountInput input, Criteria additionalCriteria);
+	CountOutput count(CountInput input, Specification<T> additionalSpecification);
 
 	/**
 	 * Returns the filtered count for the given {@link CountInput}.
-	 *
+	 * 
 	 * @param input the {@link CountInput} mapped from the Ajax request
-	 * @param additionalSpecification an additional {@link Criteria} to apply to the query
-	 *            (with an "AND" clause)
-	 * @param preFilteringSpecification a pre-filtering {@link Criteria} to apply to the query
+	 * @param additionalSpecification an additional {@link Specification} to apply to the query (with
+	 *            an "AND" clause)
+	 * @param preFilteringSpecification a pre-filtering {@link Specification} to apply to the query
 	 *            (with an "AND" clause)
 	 * @return a {@link CountOutput}
 	 */
-	CountOutput count(CountInput input, Criteria additionalCriteria, Criteria preFilteringCriteria);
+	CountOutput count(CountInput input, Specification<T> additionalSpecification,
+			Specification<T> preFilteringSpecification);
 
 }
