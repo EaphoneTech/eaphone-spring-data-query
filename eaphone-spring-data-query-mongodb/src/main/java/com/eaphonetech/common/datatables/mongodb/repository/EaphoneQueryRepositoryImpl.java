@@ -148,13 +148,6 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
 		return output;
 	}
 
-	/**
-	 * @param input
-	 * @param additionalCrit
-	 * @param preFilteringCrit
-	 * @param converter
-	 * @return
-	 */
 	@Override
 	public <View> QueryOutput<View> findAll(QueryInput input, Criteria additionalCrit, Criteria preFilteringCrit,
 			Function<T, View> converter) {

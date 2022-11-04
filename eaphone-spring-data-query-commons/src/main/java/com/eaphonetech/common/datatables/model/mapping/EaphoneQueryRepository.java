@@ -20,6 +20,7 @@ public interface EaphoneQueryRepository<T, ID extends Serializable> extends Pagi
 	/**
 	 * Returns the filtered list for the given {@link QueryInput}.
 	 *
+	 * @param <View> generic
 	 * @param input the {@link QueryInput} mapped from the Ajax request
 	 * @param converter the {@link Function} to apply to the results of the query
 	 * @return a {@link QueryOutput}

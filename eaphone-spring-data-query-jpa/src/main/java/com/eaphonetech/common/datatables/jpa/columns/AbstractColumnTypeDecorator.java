@@ -31,8 +31,8 @@ public abstract class AbstractColumnTypeDecorator {
 	/**
 	 * 根据类和属性名，转换成AbstractColumnTypeDecorator
 	 * 
-	 * @param clazz
-	 * @param attributeName
+	 * @param clazz 类
+	 * @param attributeName 属性名
 	 * @return 一定不会为 <code>null</code>
 	 */
 	public static AbstractColumnTypeDecorator forType(Class<?> clazz, String attributeName) {
