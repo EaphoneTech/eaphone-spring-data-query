@@ -6,13 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.validation.constraints.Min;
-
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Sort;
 
 import com.eaphonetech.common.datatables.model.mapping.filter.QueryFilter;
 
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 @Data

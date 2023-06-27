@@ -3,8 +3,6 @@ package com.eaphonetech.common.datatables.jpa.repository;
 import java.io.Serializable;
 import java.util.function.Function;
 
-import javax.persistence.EntityManager;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
@@ -17,6 +15,7 @@ import com.eaphonetech.common.datatables.model.mapping.QueryInput;
 import com.eaphonetech.common.datatables.model.mapping.QueryOutput;
 import com.eaphonetech.common.datatables.util.Converter;
 
+import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

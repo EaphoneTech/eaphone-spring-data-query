@@ -3,17 +3,17 @@ package com.eaphonetech.common.datatables.jpa;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.From;
-import javax.persistence.criteria.Predicate;
-
 import com.eaphonetech.common.datatables.jpa.columns.AbstractColumnTypeDecorator;
 import com.eaphonetech.common.datatables.model.mapping.filter.QueryFilter;
 import com.querydsl.core.types.Ops;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.PathBuilder;
+
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.From;
+import jakarta.persistence.criteria.Predicate;
 
 class ColumnFilter implements Filter {
 	private QueryFilter filter;
@@ -43,14 +43,12 @@ class ColumnFilter implements Filter {
 				criteriaBuilder, expression, filter);
 
 		/*
-		 * if (values.isEmpty()) { return addNullCase ? expression.isNull() :
-		 * criteriaBuilder.conjunction(); } else if (isBasicFilter()) { return
-		 * super.createPredicate(from, criteriaBuilder, attributeName); }
+		 * if (values.isEmpty()) { return addNullCase ? expression.isNull() : criteriaBuilder.conjunction(); } else if
+		 * (isBasicFilter()) { return super.createPredicate(from, criteriaBuilder, attributeName); }
 		 * 
-		 * javax.persistence.criteria.Predicate predicate; if (isBooleanComparison) {
-		 * predicate = expression.in(booleanValues); } else { predicate =
-		 * expression.as(String.class).in(values); } if (addNullCase) predicate =
-		 * criteriaBuilder.or(predicate, expression.isNull());
+		 * javax.persistence.criteria.Predicate predicate; if (isBooleanComparison) { predicate =
+		 * expression.in(booleanValues); } else { predicate = expression.as(String.class).in(values); } if (addNullCase)
+		 * predicate = criteriaBuilder.or(predicate, expression.isNull());
 		 */
 
 		return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

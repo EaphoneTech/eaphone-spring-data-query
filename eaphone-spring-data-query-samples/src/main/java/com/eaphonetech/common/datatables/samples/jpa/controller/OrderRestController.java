@@ -1,8 +1,5 @@
 package com.eaphonetech.common.datatables.samples.jpa.controller;
 
-import javax.annotation.PostConstruct;
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +13,8 @@ import com.eaphonetech.common.datatables.samples.jpa.entities.Order;
 import com.eaphonetech.common.datatables.samples.jpa.repo.OrderRepository;
 import com.fasterxml.jackson.annotation.JsonView;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController

@@ -3,6 +3,7 @@ package com.eaphonetech.common.datatables.jpa;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
@@ -129,6 +130,12 @@ abstract class AbstractPredicateBuilder<T> {
 		public int getPageNumber() {
 			throw new UnsupportedOperationException();
 		}
+
+		@Override
+		public Pageable withPage(int pageNumber) {
+			return PageRequest.of(pageNumber, limit, sort);
+		}
+
 	}
 
 }

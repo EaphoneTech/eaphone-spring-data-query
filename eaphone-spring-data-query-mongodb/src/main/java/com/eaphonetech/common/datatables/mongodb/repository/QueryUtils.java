@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.reflections.ReflectionUtils;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -427,6 +428,11 @@ public class QueryUtils {
 		@Override
 		public int getPageNumber() {
 			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Pageable withPage(int pageNumber) {
+			return PageRequest.of(pageNumber, limit, sort);
 		}
 	}
 
