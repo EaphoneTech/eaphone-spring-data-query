@@ -18,9 +18,9 @@
 	</organization>
 
 	<scm>
-		<connection>scm:git:https://github.com/EaphoneTech/eaphone-spring-data-query.git</connection>
-		<developerConnection>scm:git:https://github.com/EaphoneTech/eaphone-spring-data-query.git</developerConnection>
-		<url>https://github.com/EaphoneTech/eaphone-spring-data-query.git</url>
+		<connection>scm:git:https://e.coding.net/biggates/java-projects/eaphone-spring-data-query.git</connection>
+		<developerConnection>scm:git:https://e.coding.net/biggates/java-projects/eaphone-spring-data-query.git</developerConnection>
+		<url>https://e.coding.net/biggates/java-projects/eaphone-spring-data-query.git</url>
 		<tag>HEAD</tag>
 	</scm>
 
