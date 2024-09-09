@@ -30,17 +30,19 @@ import lombok.Data;
 public class Order {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@JsonView(QueryOutput.View.class)
 	private Integer id;
 
+	@Temporal(TemporalType.DATE)
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	@JsonView(QueryOutput.View.class)
-	private Date date;
+	private Date orderDate;
 
 	@JsonView(QueryOutput.View.class)
 	private String orderNumber;
 
+	@Column(name = "is_valid", nullable = false, columnDefinition = "TINYINT(1) UNSIGNED")
 	@JsonView(QueryOutput.View.class)
 	private boolean isValid;
 
@@ -67,7 +69,7 @@ public class Order {
 
 		Calendar c = Calendar.getInstance();
 		c.set(2005 + r.nextInt(10), r.nextInt(12), r.nextInt(28), r.nextInt(24), r.nextInt(59), r.nextInt(59));
-		o.date = c.getTime();
+		o.orderDate = c.getTime();
 
 		o.orderNumber = String.format("O%05d", r.nextInt(99999));
 		o.isValid = r.nextBoolean();
@@ -76,7 +78,7 @@ public class Order {
 
 		OrderUser user = new OrderUser();
 		user.setName("张三");
-		user.setBirthday(o.getDate());
+		user.setBirthday(o.getOrderDate());
 		user.setAge(r.nextInt(30));
 		user.setBlood("ABO".charAt(r.nextInt(3)));
 		user.setValid(r.nextBoolean());
@@ -91,7 +93,7 @@ public class Order {
 			item.setName(o.getOrderNumber() + "_" + i);
 			item.setAmount(amount);
 			item.setPrice(price);
-			item.setDate(o.getDate());
+			item.setDate(o.getOrderDate());
 			item.setValid(o.isValid());
 			items.add(item);
 
