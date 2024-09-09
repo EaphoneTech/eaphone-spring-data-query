@@ -36,7 +36,7 @@ public class OrderRestController {
 	}
 
 	/**
-	 * Insert some data to Fongo
+	 * Insert some data to h2
 	 */
 	@PostConstruct
 	public void insertSampleData() {

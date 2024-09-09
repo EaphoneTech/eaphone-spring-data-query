@@ -39,20 +39,21 @@ public abstract class AbstractColumnTypeDecorator {
 		if (clazz == null || attributeName == null) {
 			return EMPTY;
 		}
-		Field field = ReflectionUtils.findField(clazz, attributeName);
 		// TODO 嵌套关联的支持
-		if (String.class.isAssignableFrom(field.getType()) || Character.class.isAssignableFrom(field.getType())
-				|| Character.TYPE.equals(field.getType())) {
+		Field field = ReflectionUtils.findField(clazz, attributeName);
+
+		final Class<?> fieldType = field.getType();
+		if (String.class.isAssignableFrom(fieldType) || Character.class.isAssignableFrom(fieldType)
+				|| Character.TYPE.equals(fieldType)) {
 			return STRING;
-		} else if (Number.class.isAssignableFrom(field.getType()) || Byte.TYPE.equals(field.getType())
-				|| Short.TYPE.equals(field.getType()) || Integer.TYPE.equals(field.getType())
-				|| Long.TYPE.equals(field.getType())) {
+		} else if (Number.class.isAssignableFrom(fieldType) || Byte.TYPE.equals(fieldType)
+				|| Short.TYPE.equals(fieldType) || Integer.TYPE.equals(fieldType) || Long.TYPE.equals(fieldType)) {
 			return INTEGER;
-		} else if (Float.TYPE.equals(field.getType()) || Double.TYPE.equals(field.getType())) {
+		} else if (Float.TYPE.equals(fieldType) || Double.TYPE.equals(fieldType)) {
 			return DOUBLE;
-		} else if (Boolean.TYPE.isAssignableFrom(field.getType())) {
+		} else if (Boolean.TYPE.equals(fieldType) || Boolean.class.isAssignableFrom(fieldType)) {
 			return BOOLEAN;
-		} else if (Date.class.isAssignableFrom(field.getType())) {
+		} else if (Date.class.isAssignableFrom(fieldType)) {
 			return DATE;
 		}
 		return STRING;
@@ -142,7 +143,7 @@ public abstract class AbstractColumnTypeDecorator {
 				predicates.add(//
 						crit.equal(//
 								crit.function("regexp", Integer.class, exp, crit.literal(filter.get_regex()))//
-				, 1));
+								, 1));
 			}
 			if (StringUtils.hasLength(filter.get_like())) {
 				// TODO Need test here about whether '%' should be added
@@ -333,7 +334,24 @@ public abstract class AbstractColumnTypeDecorator {
 	};
 	private static final AbstractColumnTypeDecorator BOOLEAN = new AbstractColumnTypeDecorator() {
 		private Boolean parse(Object o) {
-			return o == null ? null : Boolean.parseBoolean(o.toString());
+			if (o == null) {
+				return null;
+			}
+
+			if (o.toString() != null) {
+				final String text = o.toString();
+				if ("true".equalsIgnoreCase(text)) {
+					return true;
+				} else if ("false".equalsIgnoreCase(text)) {
+					return false;
+				} else if ("1".equals(text)) {
+					return true;
+				} else if ("0".equals(text)) {
+					return false;
+				}
+			}
+
+			return Boolean.parseBoolean(o.toString());
 		}
 
 		@Override
