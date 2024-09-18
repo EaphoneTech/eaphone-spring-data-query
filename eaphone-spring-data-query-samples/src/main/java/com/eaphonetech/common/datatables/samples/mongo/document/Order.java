@@ -26,66 +26,65 @@ import lombok.Data;
 @Document(collection = "order")
 public class Order {
 
-	@Id
-	@JsonView(QueryOutput.View.class)
-	private String id;
+    @Id
+    @JsonView(QueryOutput.View.class)
+    private String id;
 
-	@JsonFormat(pattern = "yyyy-MM-dd")
-	@JsonView(QueryOutput.View.class)
-	private Date date;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonView(QueryOutput.View.class)
+    private Date date;
 
-	@JsonView(QueryOutput.View.class)
-	private String orderNumber;
+    @JsonView(QueryOutput.View.class)
+    private String orderNumber;
 
-	@JsonView(QueryOutput.View.class)
-	private Boolean isValid;
+    @JsonView(QueryOutput.View.class)
+    private Boolean isValid;
 
-	@JsonView(QueryOutput.View.class)
-	private int amount;
+    @JsonView(QueryOutput.View.class)
+    private int amount;
 
-	@JsonView(QueryOutput.View.class)
-	private Double price;
+    @JsonView(QueryOutput.View.class)
+    private Double price;
 
-	@JsonView(QueryOutput.View.class)
-	private List<OrderItem> items;
+    @JsonView(QueryOutput.View.class)
+    private List<OrderItem> items;
 
-	@Transient
-	public static Order random() {
-		Order o = new Order();
-		Random r = new Random();
+    @Transient
+    public static Order random() {
+        Order o = new Order();
+        Random r = new Random();
 
-		Calendar c = Calendar.getInstance();
-		c.set(2005 + r.nextInt(10), r.nextInt(12), r.nextInt(28), r.nextInt(24), r.nextInt(59), r.nextInt(59));
-		o.date = c.getTime();
+        Calendar c = Calendar.getInstance();
+        c.set(2005 + r.nextInt(10), r.nextInt(12), r.nextInt(28), r.nextInt(24), r.nextInt(59), r.nextInt(59));
+        o.date = c.getTime();
 
-		o.orderNumber = String.format("O%05d", r.nextInt(99999));
+        o.orderNumber = String.format("O%05d", r.nextInt(99999));
 
-		o.isValid = r.nextBoolean();
+        o.isValid = r.nextBoolean();
 
-		o.price = Math.round(100.0 * 100.0 * r.nextDouble()) / 100.0;
+        o.price = Math.round(100.0 * 100.0 * r.nextDouble()) / 100.0;
 
-		List<OrderItem> items = new ArrayList<>();
-		int itemsCount = r.nextInt(5);
-		int preciseTotalPrice = 0;
-		for (int i = 0; i < itemsCount; i++) {
-			int preciseItemPrice = r.nextInt(10000);
+        List<OrderItem> items = new ArrayList<>();
+        int itemsCount = r.nextInt(5);
+        int preciseTotalPrice = 0;
+        for (int i = 0; i < itemsCount; i++) {
+            int preciseItemPrice = r.nextInt(10000);
 
-			OrderItem item = new OrderItem();
-			item.setId(new ObjectId().toHexString());
-			item.setName(o.getOrderNumber() + "_" + i);
-			item.setAmount(amount);
-			item.setPrice((double) preciseItemPrice / 100.0);
-			item.setDate(o.getOrderDate());
-			item.setIsValid(o.getIsValid());
-			items.add(item);
+            OrderItem item = new OrderItem();
+            item.setId(new ObjectId().toHexString());
+            item.setName(o.getOrderNumber() + "_" + i);
+            item.setPrice((double) preciseItemPrice / 100.0);
+            item.setDate(o.getDate());
+            item.setIsValid(o.getIsValid());
+            items.add(item);
 
-			preciseTotalPrice += preciseItemPrice;
-		}
-		o.setPrice((double) preciseTotalPrice / 100.0);
-		o.setItems(items);
+            preciseTotalPrice += preciseItemPrice;
+        }
+        o.setPrice((double) preciseTotalPrice / 100.0);
+        o.setItems(items);
 
-		o.amount = itemsCount;
+        o.amount = itemsCount;
 
-		return o;
-	}
+        return o;
+    }
 }

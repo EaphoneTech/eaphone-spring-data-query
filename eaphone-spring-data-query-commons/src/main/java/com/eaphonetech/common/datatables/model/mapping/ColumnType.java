@@ -9,19 +9,19 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Slf4j
 public abstract class ColumnType {
-	private static final String CODE_STRING = "string";
-	private static final String CODE_INTEGER = "integer";
-	private static final String CODE_DOUBLE = "double";
-	private static final String CODE_DATE = "date";
-	private static final String CODE_BOOLEAN = "boolean";
-	private static final String CODE_NESTED_OBJECT = "object";
+    private static final String CODE_STRING = "string";
+    private static final String CODE_INTEGER = "integer";
+    private static final String CODE_DOUBLE = "double";
+    private static final String CODE_DATE = "date";
+    private static final String CODE_BOOLEAN = "boolean";
+    private static final String CODE_NESTED_OBJECT = "object";
 
-	public static final ColumnType STRING = new StringColumnType();
-	public static final ColumnType INTEGER = new IntegerColumnType();
-	public static final ColumnType DOUBLE = new DoubleColumnType();
-	public static final ColumnType DATE = new DateColumnType();
-	public static final ColumnType BOOLEAN = new BooleanColumnType();
-	public static final ColumnType NESTED_OBJECT = new NestedObjectColumnType();
+    public static final ColumnType STRING = new StringColumnType();
+    public static final ColumnType INTEGER = new IntegerColumnType();
+    public static final ColumnType DOUBLE = new DoubleColumnType();
+    public static final ColumnType DATE = new DateColumnType();
+    public static final ColumnType BOOLEAN = new BooleanColumnType();
+    public static final ColumnType NESTED_OBJECT = new NestedObjectColumnType();
 
     private String code;
     private boolean comparable;
@@ -51,42 +51,42 @@ public abstract class ColumnType {
             return STRING;
         }
 
-		if (c.isPrimitive()) {
-			// boolean, byte, char, short, int, long, float, and double.
-			 if (is(c, byte.class, char.class, short.class, int.class, long.class)) {
-				return INTEGER;
-			} else if (is(c, float.class, double.class)) {
-				return DOUBLE;
-			} else if (is(c, boolean.class)) {
-				return BOOLEAN;
-			} else {
-				// unexpected primitive type: void
-				throw new IllegalArgumentException(String.format("unexpected type '%s'", c.toString()));
-			}
-		} else if (c.isEnum()) {
-			return STRING;
-		} else if (c.isArray()) {
-			// TODO how to check array?
-			// c.getComponentType() is type of array item;
-			log.warn("Array type '{}' is not supported yet", c);
-		} else {
-			if (is(c, Character.class, String.class)) {
-				return STRING;
-			} else if (is(c, Byte.class, Short.class, Integer.class, Long.class)) {
-				return INTEGER;
-			} else if (is(c, Float.class, Double.class)) {
-				return DOUBLE;
-			} else if (is(c, Boolean.class)) {
-				return BOOLEAN;
-			} else if (is(c, Date.class)) {
-				return DATE;
-			} else {
-				// nested class
-				return NESTED_OBJECT;
-			}
-		}
-		return STRING;
-	}
+        if (c.isPrimitive()) {
+            // boolean, byte, char, short, int, long, float, and double.
+            if (is(c, byte.class, char.class, short.class, int.class, long.class)) {
+                return INTEGER;
+            } else if (is(c, float.class, double.class)) {
+                return DOUBLE;
+            } else if (is(c, boolean.class)) {
+                return BOOLEAN;
+            } else {
+                // unexpected primitive type: void
+                throw new IllegalArgumentException(String.format("unexpected type '%s'", c.toString()));
+            }
+        } else if (c.isEnum()) {
+            return STRING;
+        } else if (c.isArray()) {
+            // TODO how to check array?
+            // c.getComponentType() is type of array item;
+            log.warn("Array type '{}' is not supported yet", c);
+        } else {
+            if (is(c, Character.class, String.class)) {
+                return STRING;
+            } else if (is(c, Byte.class, Short.class, Integer.class, Long.class)) {
+                return INTEGER;
+            } else if (is(c, Float.class, Double.class)) {
+                return DOUBLE;
+            } else if (is(c, Boolean.class)) {
+                return BOOLEAN;
+            } else if (is(c, Date.class)) {
+                return DATE;
+            } else {
+                // nested class
+                return NESTED_OBJECT;
+            }
+        }
+        return STRING;
+    }
 
     public abstract Object tryConvert(Object o);
 
@@ -160,15 +160,20 @@ public abstract class ColumnType {
             super(CODE_BOOLEAN, false);
         }
 
-	static final class NestedObjectColumnType extends ColumnType {
-		NestedObjectColumnType() {
-			super(CODE_NESTED_OBJECT, false);
-		}
+        @Override
+        public Object tryConvert(Object o) {
+            return o == null ? null : o;
+        }
+    }
 
-		@Override
-		public Object tryConvert(Object o) {
-			return o == null ? null : o;
-		}
-	}
+    static final class NestedObjectColumnType extends ColumnType {
+        NestedObjectColumnType() {
+            super(CODE_NESTED_OBJECT, false);
+        }
 
+        @Override
+        public Object tryConvert(Object o) {
+            return o == null ? null : o;
+        }
+    }
 }

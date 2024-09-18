@@ -64,7 +64,7 @@ public class Order {
 	@OneToMany(targetEntity = OrderItem.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "order_id", referencedColumnName = "id")
 	private Set<OrderItem> items;
-	
+
 	@Transient
 	public static Order random() {
 		Order o = new Order();
@@ -73,12 +73,12 @@ public class Order {
 		Calendar c = Calendar.getInstance();
 		c.set(2005 + r.nextInt(10), r.nextInt(12), r.nextInt(28), r.nextInt(24), r.nextInt(59), r.nextInt(59));
 		o.orderDate = c.getTime();
-		
+
 		o.orderNumber = String.format("O%05d", r.nextInt(99999));
 		o.isValid = r.nextBoolean();
 		o.setAmount(0);
 		o.setPrice(0D);
-		
+
 		OrderUser user = new OrderUser();
 		user.setName("张三");
 		user.setBirthday(o.getOrderDate());
@@ -97,7 +97,7 @@ public class Order {
 			item.setAmount(amount);
 			item.setPrice(price);
 			item.setDate(o.getOrderDate());
-			item.setValid(o.getIsValid());
+			item.setIsValid(o.getIsValid());
 			items.add(item);
 
 			o.setAmount(o.getAmount() + amount);

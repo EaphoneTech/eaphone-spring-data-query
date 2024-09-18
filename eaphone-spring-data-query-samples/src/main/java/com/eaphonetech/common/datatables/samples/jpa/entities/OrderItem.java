@@ -37,6 +37,6 @@ public class OrderItem {
 	private Date date;
 
 	@JsonView(QueryOutput.View.class)
-	private boolean isValid;
+	private Boolean isValid;
 
 }

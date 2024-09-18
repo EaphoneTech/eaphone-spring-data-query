@@ -48,10 +48,10 @@ public abstract class AbstractColumnTypeDecorator {
         if (String.class.isAssignableFrom(fieldType) || Character.class.isAssignableFrom(fieldType)
                 || Character.TYPE.equals(fieldType)) {
             return STRING;
-        } else if (Number.class.isAssignableFrom(fieldType) || Byte.TYPE.equals(fieldType)
+        } else if (Byte.TYPE.equals(fieldType)
                 || Short.TYPE.equals(fieldType) || Integer.TYPE.equals(fieldType) || Long.TYPE.equals(fieldType)) {
             return INTEGER;
-        } else if (Float.TYPE.equals(fieldType) || Double.TYPE.equals(fieldType)) {
+        } else if (Number.class.isAssignableFrom(fieldType) || Float.TYPE.equals(fieldType) || Double.TYPE.equals(fieldType)) {
             return DOUBLE;
         } else if (Boolean.TYPE.equals(fieldType) || Boolean.class.isAssignableFrom(fieldType)) {
             return BOOLEAN;
