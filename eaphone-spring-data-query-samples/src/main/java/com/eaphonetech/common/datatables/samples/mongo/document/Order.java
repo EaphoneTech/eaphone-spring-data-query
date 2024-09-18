@@ -32,7 +32,7 @@ public class Order {
 
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	@JsonView(QueryOutput.View.class)
-	private Date date;
+	private Date orderDate;
 
 	@JsonView(QueryOutput.View.class)
 	private String orderNumber;
@@ -56,7 +56,7 @@ public class Order {
 
 		Calendar c = Calendar.getInstance();
 		c.set(2005 + r.nextInt(10), r.nextInt(12), r.nextInt(28), r.nextInt(24), r.nextInt(59), r.nextInt(59));
-		o.date = c.getTime();
+		o.orderDate = c.getTime();
 
 		o.orderNumber = String.format("O%05d", r.nextInt(99999));
 
@@ -76,7 +76,7 @@ public class Order {
 			item.setName(o.getOrderNumber() + "_" + i);
 			item.setAmount(amount);
 			item.setPrice(price);
-			item.setDate(o.getDate());
+			item.setDate(o.getOrderDate());
 			item.setValid(o.isValid());
 			items.add(item);
 

@@ -72,7 +72,7 @@ $(document).ready(function () {
 		description: 'More where on multiple columns',
 		value: {
 			where: {
-				date: {
+				orderDate: {
 					'_gt': '2012-01-01'
 				},
 				price: {
@@ -147,7 +147,7 @@ $(document).ready(function () {
 			$('<tr>')
 				.append($('<td>').text(idx + 1))
 				.append($('<td>').text(val.id))
-				.append($('<td>').text(val.date))
+				.append($('<td>').text(val.orderDate))
 				.append($('<td>').text(val.orderNumber))
 				.append($('<td>').text(val.isValid))
 				.append($('<td>').text(val.amount))
