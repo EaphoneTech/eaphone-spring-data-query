@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -19,7 +20,7 @@ import lombok.Data;
 public class OrderItem {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@JsonView(QueryOutput.View.class)
 	private Integer id;
 
@@ -37,6 +38,6 @@ public class OrderItem {
 	private Date date;
 
 	@JsonView(QueryOutput.View.class)
-	private boolean isValid;
+	private Boolean isValid;
 
 }

@@ -7,14 +7,18 @@ import java.util.Random;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.springframework.data.annotation.Transient;
 
@@ -44,7 +48,7 @@ public class Order {
 
 	@Column(name = "is_valid", nullable = false, columnDefinition = "TINYINT(1) UNSIGNED")
 	@JsonView(QueryOutput.View.class)
-	private boolean isValid;
+	private Boolean isValid;
 
 	@JsonView(QueryOutput.View.class)
 	private int amount;
@@ -94,7 +98,7 @@ public class Order {
 			item.setAmount(amount);
 			item.setPrice(price);
 			item.setDate(o.getOrderDate());
-			item.setValid(o.isValid());
+			item.setIsValid(o.getIsValid());
 			items.add(item);
 
 			o.setAmount(o.getAmount() + amount);
