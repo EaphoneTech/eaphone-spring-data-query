@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.reflections.ReflectionUtils;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -348,7 +349,7 @@ public class QueryUtils {
 		if (input.getLimit() == -1) {
 			input.setLimit(Integer.MAX_VALUE);
 		}
-		return new DataTablesPageRequest(input.getOffset(), input.getLimit(), sort);
+		return PageRequest.of(input.getOffset() / input.getLimit(), input.getLimit(), sort);
 	}
 
 	/**
@@ -377,58 +378,6 @@ public class QueryUtils {
 		return Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
 	}
 
-	private static class DataTablesPageRequest implements Pageable {
-
-		private final int offset;
-		private final int limit;
-		private final Sort sort;
-
-		public DataTablesPageRequest(int offset, int limit, Sort sort) {
-			this.offset = offset;
-			this.limit = limit;
-			this.sort = sort;
-		}
-
-		@Override
-		public long getOffset() {
-			return offset;
-		}
-
-		@Override
-		public int getPageSize() {
-			return limit;
-		}
-
-		@Override
-		public Sort getSort() {
-			return sort;
-		}
-
-		@Override
-		public Pageable next() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Pageable previousOrFirst() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Pageable first() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public boolean hasPrevious() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public int getPageNumber() {
-			throw new UnsupportedOperationException();
-		}
-	}
 
 	/**
 	 * Convert {@link QueryInput} to {@link AggregationOperation}[], mainly for column searches.
