@@ -38,13 +38,13 @@ public class Order {
 	private String orderNumber;
 
 	@JsonView(QueryOutput.View.class)
-	private boolean isValid;
+	private Boolean isValid;
 
 	@JsonView(QueryOutput.View.class)
 	private int amount;
 
 	@JsonView(QueryOutput.View.class)
-	private double price;
+	private Double price;
 
 	@JsonView(QueryOutput.View.class)
 	private List<OrderItem> items;
@@ -73,7 +73,10 @@ public class Order {
 			OrderItem item = new OrderItem();
 			item.setId(new ObjectId().toHexString());
 			item.setName(o.getOrderNumber() + "_" + i);
+			item.setAmount(amount);
 			item.setPrice((double) preciseItemPrice / 100.0);
+			item.setDate(o.getOrderDate());
+			item.setIsValid(o.getIsValid());
 			items.add(item);
 
 			preciseTotalPrice += preciseItemPrice;

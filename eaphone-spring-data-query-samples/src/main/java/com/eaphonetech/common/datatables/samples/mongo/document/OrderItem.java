@@ -19,4 +19,12 @@ public class OrderItem {
 
 	@JsonView(QueryOutput.View.class)
 	private double price;
+
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	@JsonView(QueryOutput.View.class)
+	private Date date;
+
+	@JsonView(QueryOutput.View.class)
+	private Boolean isValid;
+
 }
