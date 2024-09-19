@@ -140,7 +140,25 @@ $(document).ready(function() {
 				}
 			}
 		}
-	}];
+	}, {
+		summary: 'String field with void',
+		value: {
+			where: {
+				"orderNumber": {
+					"_isvoid": true
+				}
+			}
+		}
+	}	, {
+			summary: 'Number field with void',
+			value: {
+				where: {
+					"price": {
+						"_isvoid": true
+					}
+				}
+			}
+		}];
 
 	/** Draw example buttons */
 	$.each(examples, function(idx, val) {

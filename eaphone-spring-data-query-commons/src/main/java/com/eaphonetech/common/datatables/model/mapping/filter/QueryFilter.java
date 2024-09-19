@@ -19,4 +19,5 @@ public class QueryFilter {
     private Boolean _exists;
     private Boolean _null;
     private Boolean _empty;
+    private Boolean _isvoid;
 }
