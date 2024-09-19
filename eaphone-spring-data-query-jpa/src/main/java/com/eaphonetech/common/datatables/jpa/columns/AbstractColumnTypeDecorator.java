@@ -106,6 +106,16 @@ public abstract class AbstractColumnTypeDecorator {
             if (filter.get_ne() != null) {
                 ops.add(Expressions.stringOperation(Ops.STRING_CAST, path).ne(parse(filter.get_ne())));
             }
+            if (filter.get_isvoid() != null) {
+                if (filter.get_isvoid().booleanValue()) {
+                    // exp IS NULL OR exp = ''
+                    ops.add(Expressions.booleanOperation(Ops.OR, Expressions.stringOperation(Ops.IS_NULL, path),
+                            Expressions.stringOperation(Ops.EQ, path).eq("")));
+                } else {
+                    // exp IS NOT NULL AND exp != ''
+                    ops.add(Expressions.stringOperation(Ops.IS_NOT_NULL, path).ne(""));
+                }
+            }
             if (filter.get_in() != null) {
                 List<String> parts = convert(filter.get_in(), Object::toString);
                 BooleanExpression exp = null;
@@ -165,6 +175,15 @@ public abstract class AbstractColumnTypeDecorator {
             }
             if (filter.get_ne() != null) {
                 predicates.add(crit.notEqual(exp, filter.get_ne()));
+            }
+            if (filter.get_isvoid() != null) {
+                if (filter.get_isvoid().booleanValue()) {
+                    // exp IS NULL OR exp = ''
+                    predicates.add(crit.or(exp.isNull(), crit.equal(exp, "")));
+                } else {
+                    // exp IS NOT NULL AND exp != ''
+                    predicates.add(crit.and(exp.isNotNull(), crit.notEqual(exp, "")));
+                }
             }
             if (filter.get_in() != null) {
                 List<String> parts = convert(filter.get_in(), Object::toString);
