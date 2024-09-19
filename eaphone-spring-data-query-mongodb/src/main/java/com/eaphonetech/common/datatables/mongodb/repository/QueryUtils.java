@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -261,6 +263,30 @@ public class QueryUtils {
                     // $ne
                     c.ne(type.tryConvert(filter.get_ne()));
                     hasValidCrit = true;
+                } else if (filter.get_isvoid() != null) {
+                    if (ColumnType.STRING.equals(type)) {
+                        if (filter.get_isvoid().booleanValue()) {
+                            result.add(new Criteria().orOperator(
+                                    Criteria.where(queryFieldName).is(null),
+                                    Criteria.where(queryFieldName).is(""),
+                                    Criteria.where(queryFieldName).exists(false)));
+                        } else {
+                            c.exists(true).nin(null, "");
+                            hasValidCrit = true;
+                        }
+                    } else {
+                        // 此处对应一般类型
+                        if (filter.get_isvoid().booleanValue()) {
+                            result.add(new Criteria().orOperator(
+                                    Criteria.where(queryFieldName).is(null),
+                                    Criteria.where(queryFieldName).in(Arrays.asList("", Collections.emptyList())),
+                                    Criteria.where(queryFieldName).exists(false)));
+                        } else {
+                            c.exists(true).nin(null, "", Collections.emptyList());
+                            hasValidCrit = true;
+                        }
+                    }
+                    // TODO: 暂时 type 中还没有数组
                 } else {
                     if (filter.get_in() != null) {
                         // $in takes second place

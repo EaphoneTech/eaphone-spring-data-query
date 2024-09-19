@@ -23,33 +23,33 @@ public abstract class ColumnType {
 	public static final ColumnType BOOLEAN = new BooleanColumnType();
 	public static final ColumnType NESTED_OBJECT = new NestedObjectColumnType();
 
-	private String code;
-	private boolean comparable;
+    private String code;
+    private boolean comparable;
 
-	protected ColumnType(String code, boolean isComparable) {
-		this.code = code;
-		this.comparable = isComparable;
-	}
+    protected ColumnType(String code, boolean isComparable) {
+        this.code = code;
+        this.comparable = isComparable;
+    }
 
-	@Override
-	public String toString() {
-		return code;
-	}
+    @Override
+    public String toString() {
+        return code;
+    }
 
-	private static boolean is(Class<?> target, Class<?>... checkTypes) {
-		for (Class<?> checkClass : checkTypes) {
-			if (target.isAssignableFrom(checkClass)) {
-				return true;
-			}
-		}
-		return false;
-	}
+    private static boolean is(Class<?> target, Class<?>... checkTypes) {
+        for (Class<?> checkClass : checkTypes) {
+            if (target.isAssignableFrom(checkClass)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	public static ColumnType parse(Class<?> c) {
-		// default value is STRING
-		if (c == null) {
-			return STRING;
-		}
+    public static ColumnType parse(Class<?> c) {
+        // default value is STRING
+        if (c == null) {
+            return STRING;
+        }
 
 		if (c.isPrimitive()) {
 			// boolean, byte, char, short, int, long, float, and double.
@@ -88,83 +88,77 @@ public abstract class ColumnType {
 		return STRING;
 	}
 
-	public abstract Object tryConvert(Object o);
+    public abstract Object tryConvert(Object o);
 
-	static final class StringColumnType extends ColumnType {
-		StringColumnType() {
-			super(CODE_STRING, true);
-		}
+    static final class StringColumnType extends ColumnType {
+        StringColumnType() {
+            super(CODE_STRING, true);
+        }
 
-		@Override
-		public Object tryConvert(Object o) {
-			return o == null ? null : o.toString();
-		}
-	}
+        @Override
+        public Object tryConvert(Object o) {
+            return o == null ? null : o.toString();
+        }
+    }
 
-	static final class DateColumnType extends ColumnType {
-		DateColumnType() {
-			super(CODE_DATE, true);
-		}
+    static final class DateColumnType extends ColumnType {
+        DateColumnType() {
+            super(CODE_DATE, true);
+        }
 
-		@Override
-		public Object tryConvert(Object o) {
-			Object result = null;
-			try {
-				Date parsedDate = DateParser.parse(o.toString());
-				result = parsedDate;
-			} catch (ParseException pe) {
-				result = null;
-			}
-			return result;
-		}
-	}
+        @Override
+        public Object tryConvert(Object o) {
+            Object result = null;
+            try {
+                Date parsedDate = DateParser.parse(o.toString());
+                result = parsedDate;
+            } catch (ParseException pe) {
+                result = null;
+            }
+            return result;
+        }
+    }
 
-	static final class IntegerColumnType extends ColumnType {
-		IntegerColumnType() {
-			super(CODE_INTEGER, true);
-		}
+    static final class IntegerColumnType extends ColumnType {
+        IntegerColumnType() {
+            super(CODE_INTEGER, true);
+        }
 
-		@Override
-		public Object tryConvert(Object o) {
-			Object result = null;
-			try {
-				Integer parsedInteger = Integer.parseInt(o.toString());
-				result = parsedInteger;
-			} catch (NumberFormatException nfe) {
-				result = null;
-			}
-			return result;
-		}
-	}
+        @Override
+        public Object tryConvert(Object o) {
+            Object result = null;
+            try {
+                Integer parsedInteger = Integer.parseInt(o.toString());
+                result = parsedInteger;
+            } catch (NumberFormatException nfe) {
+                result = null;
+            }
+            return result;
+        }
+    }
 
-	static final class DoubleColumnType extends ColumnType {
-		DoubleColumnType() {
-			super(CODE_DOUBLE, true);
-		}
+    static final class DoubleColumnType extends ColumnType {
+        DoubleColumnType() {
+            super(CODE_DOUBLE, true);
+        }
 
-		@Override
-		public Object tryConvert(Object o) {
-			Object result = null;
-			try {
-				Double parsedDouble = Double.parseDouble(o.toString());
-				result = parsedDouble;
-			} catch (NumberFormatException nfe) {
-				result = null;
-			}
-			return result;
-		}
-	}
+        @Override
+        public Object tryConvert(Object o) {
+            Object result = null;
+            try {
+                Double parsedDouble = Double.parseDouble(o.toString());
+                result = parsedDouble;
+            } catch (NumberFormatException nfe) {
+                result = null;
+            }
+            return result;
+        }
+    }
 
-	static final class BooleanColumnType extends ColumnType {
-		BooleanColumnType() {
-			super(CODE_BOOLEAN, false);
-		}
-
-		@Override
-		public Object tryConvert(Object o) {
-			return o == null ? null : Boolean.parseBoolean(o.toString());
-		}
-	}
+    static final class BooleanColumnType extends ColumnType {
+        BooleanColumnType() {
+            super(CODE_BOOLEAN, false);
+        }
 
 	static final class NestedObjectColumnType extends ColumnType {
 		NestedObjectColumnType() {
