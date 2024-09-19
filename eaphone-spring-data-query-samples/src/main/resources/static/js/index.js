@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(document).ready(function() {
 	/**
 	 * $grid is the table body containing rendered
 	 * <tr>s
@@ -113,19 +113,46 @@ $(document).ready(function () {
 				}
 			}
 		}
+	}, {
+		summary: 'String field with null',
+		value: {
+			where: {
+				"orderNumber": {
+					"_in": ["O10001", null]
+				}
+			}
+		}
+	}, {
+		summary: 'Boolean field with null',
+		value: {
+			where: {
+				"isValid": {
+					"_in": [true, null]
+				}
+			}
+		}
+	}, {
+		summary: 'Number field with null',
+		value: {
+			where: {
+				"price": {
+					"_in": [25, null]
+				}
+			}
+		}
 	}];
-	
+
 	/** Draw example buttons */
 	$.each(examples, function(idx, val) {
 		$('<button type="button" class="btn btn-outline-primary mr-2 mb-2">')
 			.text(val.summary)
-			.attr({title: val.description})
-			.click(function(){
+			.attr({ title: val.description })
+			.click(function() {
 				$postInput.val(JSON.stringify(val.value, null, 2));
 			})
 			.appendTo($examples);
 	});
-	
+
 	/** default value that will apply to each request if not being overridden */
 	const DEFAULT = {
 		offset: 0,
@@ -141,9 +168,9 @@ $(document).ready(function () {
 	 * @param {object}
 	 *            data server response
 	 */
-	let display = function (data) {
+	let display = function(data) {
 		// generate table rows
-		$.each(data.data, function (idx, val) {
+		$.each(data.data, function(idx, val) {
 			$('<tr>')
 				.append($('<td>').text(idx + 1))
 				.append($('<td>').text(val.id))
@@ -182,14 +209,14 @@ $(document).ready(function () {
 	 * @param {string}
 	 *            data request body
 	 */
-	let post = function (url, data) {
+	let post = function(url, data) {
 		let jsonModel = JSON.parse(data);
 		$.ajax({
 			url: url,
 			type: 'post',
 			data: data,
 			contentType: 'application/json; charset=UTF-8',
-			success: function (response) {
+			success: function(response) {
 				model = jsonModel;
 				display(response);
 			},
@@ -198,12 +225,12 @@ $(document).ready(function () {
 	};
 
 	/** event initialization */
-	$('#btn-post').click(function () {
+	$('#btn-post').click(function() {
 		// clear output
 		$grid.empty();
 		$pagination.empty();
 		$output.empty();
-		
+
 		let requestUrl = $postUrl.val() || '';
 		let requestData = $postInput.val() || '{}';
 		post(requestUrl, requestData);
@@ -211,7 +238,7 @@ $(document).ready(function () {
 	});
 
 	/** all pagination links */
-	$('#pagination').on('click', 'a.page-link', function () {
+	$('#pagination').on('click', 'a.page-link', function() {
 		let newStart = (Number.parseInt($(this).text()) - 1) * (model.limit || DEFAULT.limit);
 		model.offset = newStart;
 		$postInput.val(JSON.stringify(model, null, 2));

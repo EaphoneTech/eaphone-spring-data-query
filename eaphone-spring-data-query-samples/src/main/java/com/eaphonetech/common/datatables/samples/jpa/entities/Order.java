@@ -46,7 +46,7 @@ public class Order {
 	@JsonView(QueryOutput.View.class)
 	private String orderNumber;
 
-	@Column(name = "is_valid", nullable = false, columnDefinition = "TINYINT(1) UNSIGNED")
+	@Column(name = "is_valid", columnDefinition = "TINYINT(1) UNSIGNED")
 	@JsonView(QueryOutput.View.class)
 	private Boolean isValid;
 
@@ -54,7 +54,7 @@ public class Order {
 	private int amount;
 
 	@JsonView(QueryOutput.View.class)
-	private double price;
+	private Double price;
 
 	@JsonView(QueryOutput.View.class)
 	@OneToOne(targetEntity = OrderUser.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -79,7 +79,7 @@ public class Order {
 		o.isValid = r.nextBoolean();
 		o.setAmount(0);
 		o.setPrice(0D);
-
+		
 		OrderUser user = new OrderUser();
 		user.setName("张三");
 		user.setBirthday(o.getOrderDate());
