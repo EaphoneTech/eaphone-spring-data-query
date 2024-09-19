@@ -270,10 +270,10 @@ public class QueryUtils {
                                 c.is(null);
                                 hasValidCrit = true;
                             } else {
+                                // 此时不改变 c 的有效性
                                 result.add(new Criteria().orOperator(
                                         Criteria.where(queryFieldName).is(null),
                                         Criteria.where(queryFieldName).in(parts)));
-                                hasValidCrit = false;
                             }
                         } else {
                             c.in(parts);
@@ -291,7 +291,6 @@ public class QueryUtils {
                                 result.add(new Criteria().orOperator(
                                         Criteria.where(queryFieldName).ne(null),
                                         Criteria.where(queryFieldName).nin(parts)));
-                                hasValidCrit = false;
                             }
                         } else {
                             c.nin(parts);
