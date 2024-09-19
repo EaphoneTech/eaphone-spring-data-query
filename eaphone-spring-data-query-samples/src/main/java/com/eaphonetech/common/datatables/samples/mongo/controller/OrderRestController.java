@@ -55,14 +55,33 @@ public class OrderRestController {
 			repo.save(o);
 		}
 
-		// some orders with specific values
-		Order o = Order.random();
-		o.setOrderNumber("O10001");
-		repo.save(o);
+        // some orders with specific values
+        Order o = Order.random();
+        o.setOrderNumber("O10001");
+        repo.save(o);
 
-		o = Order.random();
-		o.setOrderNumber("O10002");
-		repo.save(o);
+        o = Order.random();
+        o.setOrderNumber("O10002");
+        o.setPrice(25.0);
+        repo.save(o);
+
+        o = Order.random();
+        o.setOrderNumber("O10003");
+        o.setIsValid(null);
+        o.setAmount(10);
+        repo.save(o);
+
+        o = Order.random();
+        o.setOrderNumber("");
+        repo.save(o);
+
+        o = Order.random();
+        o.setOrderNumber(null);
+        repo.save(o);
+
+        o = Order.random();
+        o.setPrice(null);
+        repo.save(o);
 
 		log.debug("default data successfully initialized.");
 	}

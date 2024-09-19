@@ -38,13 +38,13 @@ public class Order {
 	private String orderNumber;
 
 	@JsonView(QueryOutput.View.class)
-	private boolean isValid;
+	private Boolean isValid;
 
 	@JsonView(QueryOutput.View.class)
 	private int amount;
 
 	@JsonView(QueryOutput.View.class)
-	private double price;
+	private Double price;
 
 	@JsonView(QueryOutput.View.class)
 	private Set<OrderItem> items;
@@ -77,7 +77,7 @@ public class Order {
 			item.setAmount(amount);
 			item.setPrice(price);
 			item.setDate(o.getOrderDate());
-			item.setValid(o.isValid());
+			item.setIsValid(o.getIsValid());
 			items.add(item);
 
 			o.setAmount(o.getAmount() + amount);
