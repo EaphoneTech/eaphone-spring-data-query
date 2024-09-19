@@ -1,6 +1,6 @@
 # Why #
 
-I use DataTables in some projects and wrote SpringMVC server side for it. Later the frontend is rewritten and DataTables is no longer used. Now is the time to refine the protocol for general data-grid query. 
+I use DataTables in some projects and wrote SpringMVC server side for it. Later the frontend is rewritten and DataTables is no longer used. Now is the time to refine the protocol for general data-grid query.
 
 * You can not assign a range via `columns[i][search][value]`, as in SQL: `BETWEEN`.
 * You can only do regular search OR regex search via `columns[i][search][regex]`, but not `=`, `LIKE`.
@@ -34,7 +34,8 @@ HTTP POST as `@RequestBody` is recommended:
             "_like": "",
             "_exists": true,
             "_isNull": true,
-            "_isEmpty": true
+            "_isEmpty": true,
+            "_isvlid": true
         }
     }
 }
@@ -56,7 +57,7 @@ e.g. NO parameters are needed.
 
 ### Pagination ###
 
-Paging is controlled by `offset` and `limit`, which keeps the same as `SKIP` and `LIMIT` in SQL. 
+Paging is controlled by `offset` and `limit`, which keeps the same as `SKIP` and `LIMIT` in SQL.
 
 ```http
 POST /search
@@ -82,7 +83,7 @@ POST /search
 }
 ```
 
-Ordering by more columns: 
+Ordering by more columns:
 
 ```http
 POST /search

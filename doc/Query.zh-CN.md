@@ -34,7 +34,8 @@
             "_like": "",
             "_exists": true,
             "_isNull": true,
-            "_isEmpty": true
+            "_isEmpty": true,
+            "_isvoid": true
         }
     }
 }

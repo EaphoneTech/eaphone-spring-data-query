@@ -4,17 +4,17 @@ This is a simple Spring Boot project using [biggates/eaphone-spring-data-query](
 
 The original sample project is [darrachequesne/spring-data-jpa-datatables-sample](https://github.com/darrachequesne/spring-data-jpa-datatables-sample).
 
-## How to run ##
+## How to run
 
 (Not verified)
 
-```
+```bash
 mvn spring-boot:run
 ```
 
 The project will start at `http://localhost:8080/`.
 
-## What is this? ##
+## What is this?
 
 This project shows how to use eaphone-spring-data-query in your project, and a very basic version of JavaScript grid.
 
@@ -22,7 +22,7 @@ The web page contains three parts: request (and examples), raw response and rend
 
 ![screen cast](../doc/quickview.gif)
 
-## Features ##
+## Features
 
 The page contains one data grid, with some pre-defined searching values.
 
@@ -33,37 +33,37 @@ On the page you can try the following features:
 * Change order by any single column
 * Pagination
 
-## Some details ##
+## Some details
 
 * During the starting process, it inserts `200` completely random rows of `Order` item in `OrderRestController#insertSampleData()`, plus 2 specific `Order` item, in order to provide at least one search result in pre-defined queries.
-* The project serves a static web page, displaying a grid using DataTables. The detailed initialization script is in `/index.js`. 
+* The project serves a static web page, displaying a grid using DataTables. The detailed initialization script is in `/index.js`.
 
-### jpa ###
+### jpa
 
 * An [H2](http://www.h2database.com/html/main.html) in-memory database is created.
 
-### mongodb ###
+### mongodb
 
 * This project uses [bwaldvogel/mongo-java-server](https://github.com/bwaldvogel/mongo-java-server) to create an in-memory MongoDB server named `test` (see `MongodbSampleApplication$Config`).
 
-* The params `startDate` and `endDate` is used to restrict the range of a value. DataTables only handles "match" type of search, which is usually not enough. The criteria and `preFiltering` is used to further define a criteria.  
+* The params `startDate` and `endDate` is used to restrict the range of a value. DataTables only handles "match" type of search, which is usually not enough. The criteria and `preFiltering` is used to further define a criteria.
 
-## Usage in your project ##
+## Usage in your project
 
 If you want to use `eaphone-spring-data-query` in your own project, these steps must be done:
 
 1. Include the library in your project (it's not in any public Maven repository yet)
 2. Declare a spring-data repo, extending `JpaQueryRepository<EntityType, KeyType>` or `MongoDBQueryRepository<DocumentType, KeyType>`
-3. Create your controller, basically as: 
+3. Create your controller, basically as:
 
-```
-    @Autowired
-    private OrderRepo repo;
+    ```java
+        @Autowired
+        private OrderRepo repo;
 
-    @GetMapping()
-    public QueryOutput<Order> getOrders(@Valid QueryInput input){
-        return repo.findAll(input);
-    }
-```
+        @GetMapping()
+        public QueryOutput<Order> getOrders(@Valid QueryInput input){
+            return repo.findAll(input);
+        }
+    ```
 
 4. Write your JavaScript for the datagrid.
