@@ -33,9 +33,9 @@ HTTP POST as `@RequestBody` is recommended:
             "_regex": "",
             "_like": "",
             "_exists": true,
-            "_isNull": true,
-            "_isEmpty": true,
-            "_isvlid": true
+            "_null": true,
+            "_empty": true,
+            "_isvoid": true
         }
     }
 }

@@ -33,8 +33,8 @@
             "_regex": "",
             "_like": "",
             "_exists": true,
-            "_isNull": true,
-            "_isEmpty": true,
+            "_null": true,
+            "_empty": true,
             "_isvoid": true
         }
     }
