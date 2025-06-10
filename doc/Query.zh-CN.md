@@ -1,11 +1,11 @@
-# 关于查询 #
+# 关于查询
 
 在实际操作中，在 DataTables 的通信协议的基础上，遇到了一些不足，主要有以下方面：
 
 * 通过 `columns[i][search][value]` 实现的按列搜索功能，不能指定范围。比如 “指定日期范围” 或者 “大于 xx 的值” 这种场景，无法在统一的一个通信协议里传递
 * 通过 `columns[i][search][regex]` 只能指定 `普通搜索` 和 `按正则表达式搜索` 两种场景，
 
-## 查询方式 ##
+## 查询方式
 
 建议在 POST 接口上通过 `@RequestBody` 方式传入较为完整的查询内容。
 
@@ -33,34 +33,48 @@
             "_regex": "",
             "_like": "",
             "_exists": true,
-            "_isNull": true,
-            "_isEmpty": true,
+            "_null": true,
+            "_empty": true,
             "_isvoid": true
         }
     }
 }
 ```
 
-## 示例 ##
+## 响应
 
-### 最简单的请求 ###
+```json
+{
+    "draw": 1,
+    "total": 0,
+    "filtered": 0,
+    "error": "",
+    "data": []
+}
+```
 
-因为 `draw`, `offset`, `limit`, `order_by`, `where` 全都改为可选的，因此最简单的请求就变成了
+## 示例
+
+### 最简单的请求
+
+因为 `draw`, `offset`, `limit`, `order_by`, `where` 全都改为可选的，因此最简单的请求就变成了：
 
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {}
 ```
 
-即：不需要任何参数。
+即：不需要传任何实际的参数。
 
-### 分页 ###
+### 分页
 
-单纯分页只需要传入 `offset` 和 `limit` 。（当然如果 `limit` 和后端一致的话也可以不传了）
+单纯分页只需要传入 `offset` 和 `limit` （当然如果 `limit` 和后端的默认值一致的话也可以不传）。
 
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {
     "offset": 30,
@@ -68,12 +82,13 @@ POST /search
 }
 ```
 
-### 按某一列排序 ###
+### 按某一列排序
 
 最简单的排序：
 
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {
     "order_by": [{
@@ -85,7 +100,8 @@ POST /search
 稍微复杂一些的排序（请注意排序的顺序是有意义的，因此使用数组形式）：
 
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {
     "order_by": [{
@@ -96,12 +112,13 @@ POST /search
 }
 ```
 
-### 按某一列筛选 ###
+### 按某一列筛选
 
 * 精确查询
 
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {
     "where": {
@@ -114,8 +131,11 @@ POST /search
 
 * 模糊查询
 
+在 MongoDB 的实现中，'_like' 会使用 `$regex`, 并且按 SQL 的写法，'%' 会被替换成 '.+'。
+
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {
     "where": {
@@ -129,7 +149,8 @@ POST /search
 * 按数值范围
 
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {
     "where": {
@@ -145,7 +166,8 @@ POST /search
 * 按时间范围
 
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {
     "where": {
@@ -159,10 +181,11 @@ POST /search
 
 ```
 
-* 按枚举 (及 `$in` 操作)
+* 按枚举 (及 `_in` 操作)
 
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {
     "where": {
@@ -173,12 +196,13 @@ POST /search
 }
 ```
 
-## 复合查询 ##
+## 复合查询
 
 默认多个查询的参数之间是 `AND` 关系。
 
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {
     "where": {
@@ -197,6 +221,6 @@ POST /search
 
 ```
 
-## 参考 ##
+## 参考
 
-* [DataTables: Server-side processing](https://datatables.net/manual/server-side) 和相应的 [中文版](http://datatables.club/manual/server-side.html)
+* [DataTables: Server-side processing](https://datatables.net/manual/server-side#Sent-parameters) 和相应的 [中文版](http://datatables.club/manual/server-side.html)

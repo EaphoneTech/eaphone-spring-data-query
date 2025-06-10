@@ -1,11 +1,11 @@
-# Why #
+# Why
 
 I use DataTables in some projects and wrote SpringMVC server side for it. Later the frontend is rewritten and DataTables is no longer used. Now is the time to refine the protocol for general data-grid query.
 
 * You can not assign a range via `columns[i][search][value]`, as in SQL: `BETWEEN`.
 * You can only do regular search OR regex search via `columns[i][search][regex]`, but not `=`, `LIKE`.
 
-## Query ##
+## Query
 
 HTTP POST as `@RequestBody` is recommended:
 
@@ -33,34 +33,48 @@ HTTP POST as `@RequestBody` is recommended:
             "_regex": "",
             "_like": "",
             "_exists": true,
-            "_isNull": true,
-            "_isEmpty": true,
-            "_isvlid": true
+            "_null": true,
+            "_empty": true,
+            "_isvoid": true
         }
     }
 }
 ```
 
-## Examples ##
+## Response format
 
-### Basic Query ###
+```json
+{
+    "draw": 1,
+    "total": 0,
+    "filtered": 0,
+    "error": "",
+    "data": []
+}
+```
+
+## Examples
+
+### Basic Query
 
 None of the `draw`, `offset`, `limit`, `order_by`, `where` are required, so the basic query is:
 
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {}
 ```
 
 e.g. NO parameters are needed.
 
-### Pagination ###
+### Pagination
 
 Paging is controlled by `offset` and `limit`, which keeps the same as `SKIP` and `LIMIT` in SQL.
 
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {
     "offset": 30,
@@ -68,12 +82,13 @@ POST /search
 }
 ```
 
-### Ordering ###
+### Ordering
 
 Ordering by one column:
 
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {
     "order_by": [{
@@ -86,7 +101,8 @@ POST /search
 Ordering by more columns:
 
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {
     "order_by": [{
@@ -97,12 +113,13 @@ POST /search
 }
 ```
 
-### Filtering ###
+### Filtering
 
 * Search by equality
 
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {
     "where": {
@@ -116,7 +133,8 @@ POST /search
 * Like (`LIKE %value%`)
 
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {
     "where": {
@@ -130,7 +148,8 @@ POST /search
 * By Numerical Range
 
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {
     "where": {
@@ -146,7 +165,8 @@ POST /search
 * Date Range & Time Range
 
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {
     "where": {
@@ -162,7 +182,8 @@ POST /search
 * In
 
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {
     "where": {
@@ -173,12 +194,13 @@ POST /search
 }
 ```
 
-## Multiple Filters ##
+## Multiple Filters
 
 Multiple filters are joined by `AND` logic.
 
 ```http
-POST /search
+POST /search HTTP/1.1
+Content-Type: application/json
 
 {
     "where": {
@@ -197,6 +219,6 @@ POST /search
 
 ```
 
-## References ##
+## References
 
-* [DataTables: Server-side processing](https://datatables.net/manual/server-side)
+* [DataTables: Server-side processing](https://datatables.net/manual/server-side#Sent-parameters)
