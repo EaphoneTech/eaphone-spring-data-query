@@ -245,19 +245,29 @@ public class QueryUtils {
 	 */
 	private static <T, ID extends Serializable> List<Criteria> getCriteria(final QueryInput input,
 			MongoEntityInformation<T, ID> entityInformation) {
+		return getCriteria(input, entityInformation.getJavaType());
+	}
+
+	/**
+	 * Convert a {@link QueryInput} to Criteia
+	 *
+	 * @param input
+	 * @return
+	 */
+	private static <T, ID extends Serializable> List<Criteria> getCriteria(final QueryInput input, Class<T> javaType) {
 		List<Criteria> result = new LinkedList<>();
 		// check for each searchable column whether a filter value exists
 		for (final Map.Entry<String, QueryFilter> entry : input.getWhere().entrySet()) {
 			final QueryFilter filter = entry.getValue();
 			final String fieldName = entry.getKey();
-			final ColumnType type = getFieldType(entityInformation.getJavaType(), fieldName);
+			final ColumnType type = getFieldType(javaType, fieldName);
 			if (type == null) {
 				throw new RuntimeException(String.format("field [%s] not exists", fieldName));
 			}
 			// handle column.filter
 			if (filter != null) {
 				boolean hasValidCrit = false;
-				final String queryFieldName = getFieldName(entityInformation.getJavaType(), fieldName);
+				final String queryFieldName = getFieldName(javaType, fieldName);
 				Criteria c = Criteria.where(queryFieldName);
 				if (filter.get_eq() != null) {
 					// $eq takes first place
@@ -442,6 +452,24 @@ public class QueryUtils {
 	 * @param input
 	 * @return
 	 */
+	private static <T, ID extends Serializable> List<AggregationOperation> toAggregationOperation(Class<T> javaType,
+			QueryInput input) {
+		List<AggregationOperation> result = new LinkedList<>();
+		List<Criteria> criteriaList = getCriteria(input, javaType);
+		if (criteriaList != null) {
+			for (final Criteria c : criteriaList) {
+				result.add(match(c));
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Convert {@link QueryInput} to {@link AggregationOperation}[], mainly for column searches.
+	 *
+	 * @param input
+	 * @return
+	 */
 	private static <T, ID extends Serializable> List<AggregationOperation> toAggregationOperation(
 			MongoEntityInformation<T, ID> entityInformation, QueryInput input) {
 		List<AggregationOperation> result = new LinkedList<>();
@@ -511,7 +539,7 @@ public class QueryUtils {
 			opList.addAll(preFilteringOperations);
 		}
 
-		opList.addAll(toAggregationOperation(null, input));
+		opList.addAll(toAggregationOperation(classOfT, input));
 
 		if (postFilteringOperations != null) {
 			opList.addAll(postFilteringOperations);
@@ -524,6 +552,9 @@ public class QueryUtils {
 			}
 			opList.add(skip((long) pageable.getOffset()));
 			opList.add(limit(pageable.getPageSize()));
+		}
+		if (opList.isEmpty()) {
+			return null;
 		}
 		return newAggregation(classOfT, opList);
 	}
