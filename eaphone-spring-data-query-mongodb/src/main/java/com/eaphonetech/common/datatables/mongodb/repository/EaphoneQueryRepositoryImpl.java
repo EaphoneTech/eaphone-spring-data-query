@@ -182,6 +182,9 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
 		return findAll(classOfView, input, operations, null);
 	}
 
+	/**
+	 * (non-Javadoc)
+	 */
 	@Override
 	public <View> QueryOutput<View> findAll(Class<View> classOfView, QueryInput input,
 			Collection<? extends AggregationOperation> preFilteringOperations,
