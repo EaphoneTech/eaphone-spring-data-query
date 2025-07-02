@@ -347,6 +347,10 @@ public class QueryUtils {
 						// like is converted to $regex
 						c.regex(getLikeFilterPattern(filter.get_like()));
 						hasValidCrit = true;
+					} else if (StringUtils.hasLength(filter.get_notlike())) {
+						// not like is converted to $regex
+						c.not().regex(getLikeFilterPattern(filter.get_notlike()));
+						hasValidCrit = true;
 					}
 
 					if (filter.get_null() != null && filter.get_null().booleanValue()) {
@@ -627,6 +631,10 @@ public class QueryUtils {
 					} else if (StringUtils.hasLength(filter.get_like())) {
 						// like is converted to $regex
 						c.regex(getLikeFilterPattern(filter.get_like()));
+						hasValidCrit = true;
+					} else if (StringUtils.hasLength(filter.get_notlike())) {
+						// not like is converted to $regex
+						c.not().regex(getLikeFilterPattern(filter.get_notlike()));
 						hasValidCrit = true;
 					}
 

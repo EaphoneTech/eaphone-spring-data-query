@@ -32,6 +32,7 @@
             "_all": [],
             "_regex": "",
             "_like": "",
+            "_notlike": "",
             "_exists": true,
             "_null": true,
             "_empty": true,
