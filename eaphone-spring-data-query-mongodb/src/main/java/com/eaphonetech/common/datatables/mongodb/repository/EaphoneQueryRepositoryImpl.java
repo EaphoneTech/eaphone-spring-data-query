@@ -60,14 +60,14 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
 	}
 
 	private long count(Query query) {
-		return this.mongoOperations.count(query, this.entityInformation.getJavaType());
+		return query.getQueryObject().isEmpty() ? count()
+				: this.mongoOperations.count(query, this.entityInformation.getJavaType());
 	}
 
 
 	private Page<T> findAll(Query q, Pageable p) {
 		// count() -> estimatedDocumentCount()
-		long count = q.getQueryObject().isEmpty() ? count()
-				: mongoOperations.count(q, this.entityInformation.getJavaType());
+		long count = count(q);
 
 		if (count == 0) {
 			return new PageImpl<T>(Collections.<T>emptyList());
