@@ -3,6 +3,7 @@ package com.eaphonetech.common.datatables.mongodb.repository;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -165,6 +166,29 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
 	@Override
 	public <View> QueryOutput<View> findAll(Class<View> classOfView, QueryInput input,
 			AggregationOperation... operations) {
+		List<AggregationOperation> ops = Arrays.asList(operations);
+		return findAll(classOfView, input, ops, null);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.data.mongodb.datatables.repository.DataTablesRepository#findAll(java.lang.Class,
+	 * org.springframework.data.jpa.datatables.mapping.QueryInput, java.util.Collection)
+	 */
+	@Override
+	public <View> QueryOutput<View> findAll(Class<View> classOfView, QueryInput input,
+			Collection<? extends AggregationOperation> operations) {
+		return findAll(classOfView, input, operations, null);
+	}
+
+	/**
+	 * (non-Javadoc)
+	 */
+	@Override
+	public <View> QueryOutput<View> findAll(Class<View> classOfView, QueryInput input,
+			Collection<? extends AggregationOperation> preFilteringOperations,
+			Collection<? extends AggregationOperation> postFilteringOperations) {
 		QueryOutput<View> output = new QueryOutput<View>();
 
 		try {
@@ -175,7 +199,8 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
 			}
 			output.setTotal(recordsTotal);
 
-			Page<View> data = findPage(this.entityInformation, classOfView, input, operations);
+			Page<View> data = findPage(this.entityInformation, classOfView, input, preFilteringOperations,
+					postFilteringOperations);
 
 			output.setData(data.getContent());
 			output.setFiltered(data.getTotalElements());
@@ -189,27 +214,16 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
 		return output;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.data.mongodb.datatables.repository.DataTablesRepository#findAll(java.lang.Class,
-	 * org.springframework.data.jpa.datatables.mapping.QueryInput, java.util.Collection)
-	 */
-	@Override
-	public <View> QueryOutput<View> findAll(Class<View> classOfView, QueryInput input,
-			Collection<? extends AggregationOperation> operations) {
-		AggregationOperation[] opArray = operations.toArray(new AggregationOperation[0]);
-		return findAll(classOfView, input, opArray);
-	}
-
 	private <View> Page<View> findPage(MongoEntityInformation<T, ID> entityInformation, Class<View> classOfView,
-			QueryInput input, AggregationOperation... operations) {
+			QueryInput input, Collection<? extends AggregationOperation> preFilteringOperations,
+			Collection<? extends AggregationOperation> postFilteringOperations) {
 		final Pageable pageable = QueryUtils.getPageable(entityInformation, input);
 
 		final TypedAggregation<T> aggWithPage = QueryUtils.makeAggregation(entityInformation.getJavaType(), input,
-				pageable, operations);
+				pageable, preFilteringOperations, postFilteringOperations);
 
-		final TypedAggregation<T> aggCount = QueryUtils.makeAggregationCountOnly(entityInformation, input, operations);
+		final TypedAggregation<T> aggCount = QueryUtils.makeAggregationCountOnly(entityInformation, input,
+				preFilteringOperations, postFilteringOperations);
 		long count = 0L;
 		AggregationResults<QueryCount> countResult = mongoOperations.aggregate(aggCount, QueryCount.class);
 

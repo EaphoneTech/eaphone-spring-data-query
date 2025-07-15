@@ -58,10 +58,11 @@ public interface MongoDBQueryRepository<T, ID extends Serializable> extends Eaph
 	 * @param <View> generic
 	 * @param classOfView class of view
 	 * @param input the {@link QueryInput} mapped from the Ajax request
-	 * @param operations aggregation operations
+	 * @param preFilteringOperations aggregation operations
 	 * @return a {@link QueryOutput}
 	 */
-	<View> QueryOutput<View> findAll(Class<View> classOfView, QueryInput input, AggregationOperation... operations);
+	<View> QueryOutput<View> findAll(Class<View> classOfView, QueryInput input,
+			AggregationOperation... preFilteringOperations);
 
 	/**
 	 * Returns the filtered list for the given {@link QueryInput} using the given {@link TypedAggregation}
@@ -69,11 +70,25 @@ public interface MongoDBQueryRepository<T, ID extends Serializable> extends Eaph
 	 * @param <View> generic
 	 * @param classOfView class of view
 	 * @param input the {@link QueryInput} mapped from the Ajax request
-	 * @param operations aggregation operations
+	 * @param preFilteringOperations aggregation operations before applying input
 	 * @return a {@link QueryOutput}
 	 */
 	<View> QueryOutput<View> findAll(Class<View> classOfView, QueryInput input,
-			Collection<? extends AggregationOperation> operations);
+			Collection<? extends AggregationOperation> preFilteringOperations);
+
+	/**
+	 * Returns the filtered list for the given {@link QueryInput} using the given {@link TypedAggregation}
+	 * 
+	 * @param <View> generic
+	 * @param classOfView class of view
+	 * @param input the {@link QueryInput} mapped from the Ajax request
+	 * @param preFilteringOperations aggregation operations before applying input, usually any $match es
+	 * @param postFilteringOperations aggregation operations after applying input, maybe $group, $project s
+	 * @return a {@link QueryOutput}
+	 */
+	<View> QueryOutput<View> findAll(Class<View> classOfView, QueryInput input,
+			Collection<? extends AggregationOperation> preFilteringOperations,
+			Collection<? extends AggregationOperation> postFilteringOperations);
 
 	/**
 	 * Returns the filtered count for the given {@link CountInput}.
