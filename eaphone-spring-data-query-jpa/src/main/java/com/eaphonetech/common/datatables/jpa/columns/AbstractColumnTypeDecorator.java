@@ -216,17 +216,23 @@ public abstract class AbstractColumnTypeDecorator {
 				// TODO Need test here about regular expressions
 				// src:
 				// https://stackoverflow.com/questions/24995881/use-regular-expressions-in-jpa-criteriabuilder
-				predicates.add(//
-						crit.equal(//
-								crit.function("regexp", Integer.class, exp, crit.literal(filter.get_regex()))//
-								, 1));
+				Expression<String> patternLiteral = crit.literal(filter.get_regex());
+
+				// 尝试直接使用函数返回的布尔值作为谓词
+				try {
+					predicates.add( //
+							crit.isTrue( //
+									crit.function("regexp", Boolean.class, exp, patternLiteral)
+					//
+					));
+				} catch (IllegalArgumentException e) {
+					System.err.println("Failed to create regexp predicate with function: " + e.getMessage());
+				}
 			}
 			if (StringUtils.hasLength(filter.get_like())) {
-				// TODO Need test here about whether '%' should be added
 				predicates.add(crit.like(exp, filter.get_like()));
 			}
 			if (StringUtils.hasLength(filter.get_notlike())) {
-				// TODO Need test here about whether '%' should be added
 				predicates.add(crit.like(exp, filter.get_notlike()).not());
 			}
 			if (filter.get_empty() != null) {

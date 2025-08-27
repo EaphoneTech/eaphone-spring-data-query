@@ -144,12 +144,12 @@ $(document).ready(function() {
 			}]
 		}
 	}, {
-		summary: 'Like',
-		description: 'SQL like',
+		summary: 'Not Like',
+		description: 'SQL NOT like',
 		value: {
 			where: {
 				"orderNumber": {
-					"_like": "O100%"
+					"_notlike": "O100%"
 				}
 			}
 		}
