@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -200,7 +201,34 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
 			output.setTotal(recordsTotal);
 
 			Page<View> data = findPage(this.entityInformation, classOfView, input, preFilteringOperations,
-					postFilteringOperations);
+					postFilteringOperations, null);
+
+			output.setData(data.getContent());
+			output.setFiltered(data.getTotalElements());
+
+		} catch (Exception e) {
+			output.setError(e.toString());
+			output.setFiltered(0L);
+			log.error("caught exception", e);
+		}
+
+		return output;
+	}
+
+	@Override
+	public <View> QueryOutput<View> findAll(Class<View> classOfView, QueryInput input,
+			UnaryOperator<List<AggregationOperation>> aggregationModifier) {
+		QueryOutput<View> output = new QueryOutput<View>();
+
+		try {
+			// TODO here count() may not be accurate because Aggregation is not simply a filter
+			long recordsTotal = count();
+			if (recordsTotal == 0) {
+				return output;
+			}
+			output.setTotal(recordsTotal);
+
+			Page<View> data = findPage(this.entityInformation, classOfView, input, null, null, aggregationModifier);
 
 			output.setData(data.getContent());
 			output.setFiltered(data.getTotalElements());
@@ -216,14 +244,15 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
 
 	private <View> Page<View> findPage(MongoEntityInformation<T, ID> entityInformation, Class<View> classOfView,
 			QueryInput input, Collection<? extends AggregationOperation> preFilteringOperations,
-			Collection<? extends AggregationOperation> postFilteringOperations) {
+			Collection<? extends AggregationOperation> postFilteringOperations,
+			UnaryOperator<List<AggregationOperation>> aggregationModifier) {
 		final Pageable pageable = QueryUtils.getPageable(entityInformation, input);
 
 		final TypedAggregation<T> aggWithPage = QueryUtils.makeAggregation(entityInformation.getJavaType(), input,
-				pageable, preFilteringOperations, postFilteringOperations);
+				pageable, preFilteringOperations, postFilteringOperations, aggregationModifier);
 
 		final TypedAggregation<T> aggCount = QueryUtils.makeAggregationCountOnly(entityInformation, input,
-				preFilteringOperations, postFilteringOperations);
+				preFilteringOperations, postFilteringOperations, aggregationModifier);
 		long count = 0L;
 		AggregationResults<QueryCount> countResult = mongoOperations.aggregate(aggCount, QueryCount.class);
 

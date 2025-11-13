@@ -2,7 +2,9 @@ package com.eaphonetech.common.datatables.mongodb.repository;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
@@ -89,6 +91,18 @@ public interface MongoDBQueryRepository<T, ID extends Serializable> extends Eaph
 	<View> QueryOutput<View> findAll(Class<View> classOfView, QueryInput input,
 			Collection<? extends AggregationOperation> preFilteringOperations,
 			Collection<? extends AggregationOperation> postFilteringOperations);
+
+	/**
+	 * Returns the filtered list for the given {@link QueryInput} by aggregation, with additional modifier
+	 * 
+	 * @param <View> generic
+	 * @param classOfView class of view
+	 * @param input the {@link QueryInput} mapped from the Ajax request
+	 * @param aggregationModifier aggregation modifier
+	 * @return a {@link QueryOutput}
+	 */
+	<View> QueryOutput<View> findAll(Class<View> classOfView, QueryInput input,
+			UnaryOperator<List<AggregationOperation>> aggregationModifier);
 
 	/**
 	 * Returns the filtered count for the given {@link CountInput}.
