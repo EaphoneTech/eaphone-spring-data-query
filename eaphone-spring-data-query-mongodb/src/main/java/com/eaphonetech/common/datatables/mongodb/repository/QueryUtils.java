@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -508,7 +509,8 @@ public class QueryUtils {
 	public static <T, ID extends Serializable> TypedAggregation<T> makeAggregationCountOnly(
 			MongoEntityInformation<T, ID> entityInformation, QueryInput input,
 			@Nullable Collection<? extends AggregationOperation> preFilteringOperations,
-			@Nullable Collection<? extends AggregationOperation> postFilteringOperations) {
+			@Nullable Collection<? extends AggregationOperation> postFilteringOperations,
+			UnaryOperator<List<AggregationOperation>> aggregationModifier) {
 		List<AggregationOperation> opList = new ArrayList<>();
 		if (preFilteringOperations != null) {
 			opList.addAll(preFilteringOperations);
@@ -518,6 +520,10 @@ public class QueryUtils {
 
 		if (postFilteringOperations != null) {
 			opList.addAll(postFilteringOperations);
+		}
+
+		if (aggregationModifier != null) {
+			opList = aggregationModifier.apply(opList);
 		}
 
 		opList.add(group().count().as("_count"));
@@ -537,7 +543,8 @@ public class QueryUtils {
 	 */
 	public static <T> TypedAggregation<T> makeAggregation(Class<T> classOfT, QueryInput input, Pageable pageable,
 			@Nullable Collection<? extends AggregationOperation> preFilteringOperations,
-			@Nullable Collection<? extends AggregationOperation> postFilteringOperations) {
+			@Nullable Collection<? extends AggregationOperation> postFilteringOperations,
+			UnaryOperator<List<AggregationOperation>> aggregationModifier) {
 		List<AggregationOperation> opList = new ArrayList<>();
 		if (preFilteringOperations != null) {
 			opList.addAll(preFilteringOperations);
@@ -556,6 +563,10 @@ public class QueryUtils {
 			}
 			opList.add(skip((long) pageable.getOffset()));
 			opList.add(limit(pageable.getPageSize()));
+		}
+
+		if (aggregationModifier != null) {
+			opList = aggregationModifier.apply(opList);
 		}
 		if (opList.isEmpty()) {
 			return null;

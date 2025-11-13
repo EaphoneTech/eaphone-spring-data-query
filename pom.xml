@@ -9,7 +9,7 @@
 
 	<groupId>com.eaphonetech</groupId>
 	<artifactId>eaphone-spring-data-query-parent</artifactId>
-	<version>2.2.0</version>
+	<version>2.3.0</version>
 	<packaging>pom</packaging>
 
 	<organization>
@@ -21,7 +21,7 @@
 		<connection>scm:git:https://github.com/EaphoneTech/eaphone-spring-data-query.git</connection>
 		<developerConnection>scm:git:https://github.com/EaphoneTech/eaphone-spring-data-query.git</developerConnection>
 		<url>https://github.com/EaphoneTech/eaphone-spring-data-query</url>
-		<tag>2.2.0</tag>
+		<tag>2.3.0</tag>
 	</scm>
 
 	<properties>

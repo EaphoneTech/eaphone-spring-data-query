@@ -1,0 +1,9 @@
+# .cnb.yml
+master:
+  push:
+    - stages:
+        - name: webhook-trigger
+          jobs:
+            - name: send-webhook
+              script: |
+                curl --header "Content-Type: application/json" --request POST --data "{}" http://flow-openapi.aliyun.com/scm/webhook/InMHPgZlAHDDVQdSa27W
