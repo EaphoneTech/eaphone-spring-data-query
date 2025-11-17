@@ -256,7 +256,7 @@ public class EaphoneQueryRepositoryImpl<T, ID extends Serializable> extends Simp
 		long count = 0L;
 		AggregationResults<QueryCount> countResult = mongoOperations.aggregate(aggCount, QueryCount.class);
 
-		if (countResult != null) {
+		if (countResult != null && countResult.getUniqueMappedResult() != null) {
 			count = countResult.getUniqueMappedResult().getCount();
 		}
 
